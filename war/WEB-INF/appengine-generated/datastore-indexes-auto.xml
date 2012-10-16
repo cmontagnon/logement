@@ -1,0 +1,11 @@
+<!-- Indices written at Tue, 16 Oct 2012 09:19:01 UTC -->
+
+<datastore-indexes>
+
+    <!-- Used 3 times in query history -->
+    <datastore-index kind="Annonce" ancestor="false" source="auto">
+        <property name="arrondissement" direction="asc"/>
+        <property name="date" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>
