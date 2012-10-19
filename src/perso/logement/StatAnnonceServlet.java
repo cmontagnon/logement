@@ -10,7 +10,7 @@ import static java.util.Calendar.MINUTE;
 import static java.util.Calendar.MONTH;
 import static java.util.Calendar.YEAR;
 import static org.datanucleus.util.StringUtils.isEmpty;
-import static perso.logement.SeLogerUtils.humanReadableQuartier;
+import static perso.logement.SeLogerUtils.arrondissements;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -48,11 +48,27 @@ public class StatAnnonceServlet extends HttpServlet {
     resp.getWriter().println("<body>");
 
     resp.getWriter().println("<form action=\"/stats\" method=\"get\">");
+    // start date filter
     resp.getWriter().println(
-        "<div>Date de début :<input name=\"startDate\" value=\"" + startDateParameter + "\"/></div>");
+        "<div>Date de début :<input name=\"startDate\" value=\""
+            + (startDateParameter == null ? "" : startDateParameter) + "\"/></div>");
+
+    // arrondissement filter
     resp.getWriter().println(
-        "<div>Arrondissement :<input name=\"arrondissement\" value=\"" + arrondissementParameter + "\"/></div>");
-    resp.getWriter().println("<div>Quartier :<input name=\"quartier\" value=\"" + quartierParameter + "\"/></div>");
+        "<div>Arrondissement :<select name=\"arrondissement\" value=\"" + arrondissementParameter + "\">");
+    resp.getWriter().println("<option/>");
+    for (Short arrondissement : SeLogerUtils.arrondissements.keySet()) {
+      resp.getWriter().println(
+          "<option value=\"" + arrondissement + "\" + "
+              + (arrondissementParameter.equals(arrondissement.toString()) ? "selected=\"selected\"" : "") + ">"
+              + arrondissement + "</option>");
+    }
+    resp.getWriter().println("</select>");
+
+    // quartier filter
+    resp.getWriter().println(
+        "<div>Quartier :<input name=\"quartier\" value=\"" + (quartierParameter == null ? "" : quartierParameter)
+            + "\"/></div>");
     resp.getWriter().println("<div><input type=\"submit\" value=\"Submit\" /></div>");
     resp.getWriter().println("</form>");
 
@@ -65,9 +81,10 @@ public class StatAnnonceServlet extends HttpServlet {
         queryString.append(" where date>:startDate");
         if (!isEmpty(arrondissementParameter)) {
           queryString.append(" and arrondissement=" + arrondissementParameter);
-        }
-        if (!isEmpty(quartierParameter)) {
-          queryString.append(" and quartier=\"" + humanReadableQuartier.get(quartierParameter) + "\"");
+          if (!isEmpty(quartierParameter)) {
+            queryString.append(" and quartier=\""
+                + arrondissements.get(new Short(arrondissementParameter)).get(quartierParameter) + "\"");
+          }
         }
         queryString.append(" order by date asc");
 

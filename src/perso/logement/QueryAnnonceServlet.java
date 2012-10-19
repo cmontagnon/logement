@@ -3,14 +3,12 @@ package perso.logement;
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Lists.newArrayList;
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Maps.newHashMap;
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Sets.newHashSet;
-import static perso.logement.SeLogerUtils.humanReadableQuartier;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -22,8 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("serial")
 public class QueryAnnonceServlet extends HttpServlet {
-
-  private static final Logger log = Logger.getLogger(QueryAnnonceServlet.class.getName());
 
   private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -43,13 +39,13 @@ public class QueryAnnonceServlet extends HttpServlet {
         queryString.append(" where arrondissement=");
         queryString.append(req.getParameter("arrondissement"));
         whereClauseCreated = true;
-      }
-
-      if (req.getParameter("quartier") != null) {
-        queryString.append(" " + (whereClauseCreated ? "and" : "where") + " quartier='");
-        queryString.append(humanReadableQuartier.get(req.getParameter("quartier")));
-        queryString.append("'");
-        whereClauseCreated = true;
+        if (req.getParameter("quartier") != null) {
+          queryString.append(" " + (whereClauseCreated ? "and" : "where") + " quartier='");
+          queryString.append(SeLogerUtils.arrondissements.get(new Short(req.getParameter("arrondissement"))).get(
+              req.getParameter("quartier")));
+          queryString.append("'");
+          whereClauseCreated = true;
+        }
       }
 
       if (req.getParameter("reference") != null) {

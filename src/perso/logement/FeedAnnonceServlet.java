@@ -118,8 +118,8 @@ public class FeedAnnonceServlet extends HttpServlet {
       String text = annonceElement.getElementsByClass("rech_desc_right_photo").get(0).ownText(); // TODO : make sure there's only one
       String reference = annonceElement.getElementsByClass("rech_majref").get(0).ownText().substring(13); // TODO : make sure there's only one
       Annonce annonce =
-          new Annonce(reference, text, prix, superficie, new Date(), arrondissement,
-              SeLogerUtils.humanReadableQuartier.get(quartier));
+          new Annonce(reference, text, prix, superficie, new Date(), arrondissement, SeLogerUtils.arrondissements.get(
+              arrondissement).get(quartier));
       annonces.add(annonce);
     }
     return annonces;
