@@ -2,37 +2,37 @@
 <cronentries>
     <!-- Arrondissement 10 -->
     <cron>
-        <url>/logement?quartier=133091&#x26;arrondissement=10</url>
+        <url>/feedAnnonce?quartier=133091&#x26;arrondissement=10</url>
         <description>10ieme-Saint Vincent de Paul/Lariboisiere</description>
         <schedule>every monday 06:00</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133092&#x26;arrondissement=10</url>
+        <url>/feedAnnonce?quartier=133092&#x26;arrondissement=10</url>
         <description>10ième-Louis Blanc/Aqueduc</description>
         <schedule>every monday 06:01</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133093&#x26;arrondissement=10</url>
+        <url>/feedAnnonce?quartier=133093&#x26;arrondissement=10</url>
         <description>10ième-Grange aux belles/Terrage</description>
         <schedule>every monday 06:02</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133094&#x26;arrondissement=10</url>
+        <url>/feedAnnonce?quartier=133094&#x26;arrondissement=10</url>
         <description>10ième-Faubourg du temple/Hôpital Saint Louis</description>
         <schedule>every monday 06:03</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133095&#x26;arrondissement=10</url>
+        <url>/feedAnnonce?quartier=133095&#x26;arrondissement=10</url>
         <description>10ième-Château d'Eau/Lancry</description>
         <schedule>every monday 06:04</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133096&#x26;arrondissement=10</url>
+        <url>/feedAnnonce?quartier=133096&#x26;arrondissement=10</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every monday 06:05</schedule>
         <timezone>Europe/Paris</timezone>
@@ -40,74 +40,74 @@
     
     <!-- Arrondissement 18 -->
     <cron>
-        <url>/logement?quartier=133146#x26;arrondissement=18</url>
+        <url>/feedAnnonce?quartier=133146#x26;arrondissement=18</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:00</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133147#x26;arrondissement=18</url>
+        <url>/feedAnnonce?quartier=133147#x26;arrondissement=18</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:01</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133148#x26;arrondissement=18</url>
+        <url>/feedAnnonce?quartier=133148#x26;arrondissement=18</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:02</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133150#x26;arrondissement=18</url>
+        <url>/feedAnnonce?quartier=133150#x26;arrondissement=18</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:03</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133151#x26;arrondissement=18</url>
+        <url>/feedAnnonce?quartier=133151#x26;arrondissement=18</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:04</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133152#x26;arrondissement=18</url>
+        <url>/feedAnnonce?quartier=133152#x26;arrondissement=18</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:05</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133153#x26;arrondissement=18</url>
+        <url>/feedAnnonce?quartier=133153#x26;arrondissement=18</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:06</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     
     <cron>
-        <url>/logement?quartier=133149#x26;arrondissement=18#x26;nbPieces=1</url>
+        <url>/feedAnnonce?quartier=133149#x26;arrondissement=18#x26;nbPieces=1</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:07</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133149#x26;arrondissement=18#x26;nbPieces=2</url>
+        <url>/feedAnnonce?quartier=133149#x26;arrondissement=18#x26;nbPieces=2</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:08</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133149#x26;arrondissement=18#x26;nbPieces=3</url>
+        <url>/feedAnnonce?quartier=133149#x26;arrondissement=18#x26;nbPieces=3</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:09</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133149#x26;arrondissement=18#x26;nbPieces=4</url>
+        <url>/feedAnnonce?quartier=133149#x26;arrondissement=18#x26;nbPieces=4</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:10</schedule>
         <timezone>Europe/Paris</timezone>
     </cron>
     <cron>
-        <url>/logement?quartier=133149#x26;arrondissement=18#x26;nbPieces=5</url>
+        <url>/feedAnnonce?quartier=133149#x26;arrondissement=18#x26;nbPieces=5</url>
         <description>10ième-Porte Saint-Denis/Paradis</description>
         <schedule>every tuesday 06:11</schedule>
         <timezone>Europe/Paris</timezone>

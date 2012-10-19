@@ -6,7 +6,6 @@ import static java.lang.Integer.parseInt;
 import static java.lang.Short.parseShort;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
@@ -31,13 +30,18 @@ import com.google.appengine.api.urlfetch.URLFetchService;
 import com.google.appengine.api.urlfetch.URLFetchServiceFactory;
 
 @SuppressWarnings("serial")
-public class LogementServlet extends HttpServlet {
+public class FeedAnnonceServlet extends HttpServlet {
 
-  private static final Logger log = Logger.getLogger(LogementServlet.class.getName());
+  private static final int MAX_PAGE_NUMBER = 29;
+  private static final String QUARTIER = "quartier";
+  private static final String ARRONDISSEMENT = "arrondissement";
 
+  private static final Logger log = Logger.getLogger(FeedAnnonceServlet.class.getName());
+
+  @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    short arrondissement = parseShort(req.getParameter("arrondissement"));
-    String quartier = req.getParameter("quartier");
+    short arrondissement = parseShort(req.getParameter(ARRONDISSEMENT));
+    String quartier = req.getParameter(QUARTIER);
     Integer nbPieces = null;
     if (req.getParameter("nbPieces") != null) {
       nbPieces = parseInt(req.getParameter("nbPieces"));
@@ -57,30 +61,42 @@ public class LogementServlet extends HttpServlet {
     Document firstPage = download(1, arrondissement, quartier, nbPiecesSpecifiedByUser);
     if (nbPiecesSpecifiedByUser == null && doesPageContainTooManyAnnonces(firstPage)) {
       for (int nbPieces = 1; nbPieces <= 5; nbPieces++) {
-        processOneType(arrondissement, quartier, nbPieces);
+        processOnePieceType(arrondissement, quartier, nbPieces);
       }
     } else {
-      processOneType(arrondissement, quartier, nbPiecesSpecifiedByUser);
+      processOnePieceType(arrondissement, quartier, nbPiecesSpecifiedByUser);
     }
 
   }
 
-  private static void processOneType(short arrondissement, String quartier, Integer nbPieces) throws IOException {
-    boolean currentPageHasAnnonces = true;
+  private static void processOnePieceType(short arrondissement, String quartier, Integer nbPieces) throws IOException {
     int currentPage = 0;
-    while (currentPageHasAnnonces) {
+    Set<Annonce> annonces;
+    do {
       currentPage++;
       log.log(Level.INFO, "Parsing page " + currentPage);
-      Set<Annonce> annonces = newHashSet();
       Document doc = null;
       while (doc == null) {
         doc = download(currentPage, arrondissement, quartier, nbPieces);
       }
-      currentPageHasAnnonces = parsePage(doc, arrondissement, quartier, annonces);
+      annonces = parsePage(doc, arrondissement, quartier);
+      persistAnnonces(annonces);
       log.log(Level.INFO, "nb annonces in page " + currentPage + ": " + annonces.size());
       for (Annonce annonce : annonces) {
         log.log(Level.INFO, annonce.toString());
       }
+    } while (!annonces.isEmpty());
+  }
+
+  private static void persistAnnonces(Set<Annonce> annonces) {
+    PersistenceManager pm = PMF.get().getPersistenceManager();
+    try {
+      for (Annonce annonce : annonces) {
+        log.log(Level.INFO, "persisting annonce " + annonce);
+        pm.makePersistent(annonce);
+      }
+    } finally {
+      pm.close();
     }
   }
 
@@ -89,14 +105,13 @@ public class LogementServlet extends HttpServlet {
     String nbPagesAsString = nbPagesElement.get(0).ownText();
     int nbPages = parseInt(nbPagesAsString.substring(nbPagesAsString.indexOf("sur") + 4));
     // There's too many pages we must add research criteria
-    return nbPages == 29; // TODO : magic number...
+    return nbPages == MAX_PAGE_NUMBER;
   }
 
-  private static boolean parsePage(Document doc, short arrondissement, String quartier, Set<Annonce> annonces) {
-    boolean currentPageHasAnnonces;
+  public static Set<Annonce> parsePage(Document doc, short arrondissement, String quartier) {
+    Set<Annonce> annonces = newHashSet();
 
     Elements annonceElements = doc.getElementsByClass("ann_ann");
-    currentPageHasAnnonces = annonceElements.size() > 0;
     for (Element annonceElement : annonceElements) {
       double superficie = getSuperficice(annonceElement);
       double prix = getPrix(annonceElement);
@@ -106,20 +121,12 @@ public class LogementServlet extends HttpServlet {
           new Annonce(reference, text, prix, superficie, new Date(), arrondissement,
               SeLogerUtils.humanReadableQuartier.get(quartier));
       annonces.add(annonce);
-      PersistenceManager pm = PMF.get().getPersistenceManager();
-      try {
-        log.log(Level.INFO, "persisting annonce " + annonce);
-        pm.makePersistent(annonce);
-      } finally {
-        pm.close();
-      }
     }
-    //}
-    return currentPageHasAnnonces;
+    return annonces;
   }
 
-  private static double getPrix(Element element) {
-    String prixAsString = element.getElementsByClass("mea2").text();
+  private static double getPrix(Element annonceElement) {
+    String prixAsString = annonceElement.getElementsByClass("mea2").text();
     Pattern pattern = Pattern.compile("[\\d|\u00A0| ]+");
     Matcher matcher = pattern.matcher(prixAsString);
     Character.isWhitespace(prixAsString.codePointAt(2));
@@ -144,12 +151,6 @@ public class LogementServlet extends HttpServlet {
       }
     }
     return superficie;
-  }
-
-  public static void main(String[] args) throws IOException {
-    Set<Annonce> annonces = newHashSet();
-    Document doc = Jsoup.parse(new File("recherche.htm"), "UTF-8");
-    parsePage(doc, new Short("1"), "133094", annonces);
   }
 
   private static Document download(int currentPage, short arrondissement, String quartier, Integer nbPieces)

@@ -1,5 +1,7 @@
 package perso.logement;
 
+import static javax.persistence.TemporalType.TIMESTAMP;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -7,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
 import javax.persistence.Transient;
 
 @Entity
@@ -19,6 +22,7 @@ public class Annonce {
   private String text;
   private double prix;
   private double superficie;
+  @Temporal(TIMESTAMP)
   private Date date;
   private short arrondissement;
   private String quartier;

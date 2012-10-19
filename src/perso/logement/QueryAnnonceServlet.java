@@ -3,8 +3,10 @@ package perso.logement;
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Lists.newArrayList;
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Maps.newHashMap;
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Sets.newHashSet;
+import static perso.logement.SeLogerUtils.humanReadableQuartier;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,12 +20,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.appengine.labs.repackaged.com.google.common.collect.Lists;
-
 @SuppressWarnings("serial")
-public class StatLogementServlet extends HttpServlet {
+public class QueryAnnonceServlet extends HttpServlet {
 
-  private static final Logger log = Logger.getLogger(StatLogementServlet.class.getName());
+  private static final Logger log = Logger.getLogger(QueryAnnonceServlet.class.getName());
+
+  private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
   private static final EntityManagerFactory emfInstance = Persistence
       .createEntityManagerFactory("transactions-optional");
@@ -44,14 +46,16 @@ public class StatLogementServlet extends HttpServlet {
       }
 
       if (req.getParameter("quartier") != null) {
-        queryString.append(" " + (whereClauseCreated ? "and" : "where") + " quartier=");
-        queryString.append(req.getParameter("quartier"));
+        queryString.append(" " + (whereClauseCreated ? "and" : "where") + " quartier='");
+        queryString.append(humanReadableQuartier.get(req.getParameter("quartier")));
+        queryString.append("'");
         whereClauseCreated = true;
       }
 
       if (req.getParameter("reference") != null) {
-        queryString.append(" " + (whereClauseCreated ? "and" : "where") + " reference=");
+        queryString.append(" " + (whereClauseCreated ? "and" : "where") + " reference='");
         queryString.append(req.getParameter("reference"));
+        queryString.append("'");
       }
 
       //queryString.append(" group by reference, superficie, arrondissement, quartier");
@@ -76,16 +80,14 @@ public class StatLogementServlet extends HttpServlet {
 
       resp.getWriter().println("<body>");
 
-      resp.getWriter().println("Il y a actuellement " + annonces.size() + " annonces<br/>");
-      Map<AnnonceKey, List<Double>> prixByAnnonce = newHashMap();
+      Map<AnnonceKey, List<Annonce>> prixByAnnonce = newHashMap();
       for (Annonce annonce : annonces) {
         if (prixByAnnonce.containsKey(annonce.getKey())) {
-          prixByAnnonce.get(annonce.getKey()).add(annonce.getPrix());
+          prixByAnnonce.get(annonce.getKey()).add(annonce);
         } else {
-          List<Double> prices = Lists.newArrayList();
-          prices.add(annonce.getPrix());
-          prixByAnnonce.put(new AnnonceKey(annonce.getReference(), annonce.getSuperficie(),
-              annonce.getArrondissement(), annonce.getQuartier()), prices);
+          List<Annonce> relatedAnnonces = newArrayList();
+          relatedAnnonces.add(annonce);
+          prixByAnnonce.put(annonce.getKey(), relatedAnnonces);
         }
       }
       resp.getWriter().println("<table id=\"table-3\">");
@@ -94,13 +96,24 @@ public class StatLogementServlet extends HttpServlet {
       resp.getWriter().println("<th><b>Superficie</b></th>");
       resp.getWriter().println("<th><b>Arrondissement</b></th>");
       resp.getWriter().println("<th><b>Quartier</b></th>");
+      resp.getWriter().println("<th><b>Text</b></th>");
       resp.getWriter().println("<th><b>Prix</b></th>");
       resp.getWriter().println("</thead>");
 
       resp.getWriter().println("<tbody>");
       for (AnnonceKey key : prixByAnnonce.keySet()) {
         Set<Double> uniquePrices = newHashSet();
-        List<Double> prices = prixByAnnonce.get(key);
+        List<Annonce> relatedAnnonces = prixByAnnonce.get(key);
+        List<Double> prices = newArrayList();
+        List<String> priceString = newArrayList();
+        Double previousPrice = null;
+        for (Annonce annonce : relatedAnnonces) {
+          prices.add(annonce.getPrix());
+          if (previousPrice == null || !previousPrice.equals(annonce.getPrix())) {
+            priceString.add(simpleDateFormat.format(annonce.getDate()) + "->" + annonce.getPrix() + "</br>");
+          }
+          previousPrice = annonce.getPrix();
+        }
         uniquePrices.addAll(prices);
         if (uniquePrices.size() > 1) {
           double lastPrice = prices.get(prices.size() - 1);
@@ -114,7 +127,9 @@ public class StatLogementServlet extends HttpServlet {
         resp.getWriter().println("<td>" + key.getSuperficie() + "</td>");
         resp.getWriter().println("<td>" + key.getArrondissement() + "</td>");
         resp.getWriter().println("<td>" + key.getQuartier() + "</td>");
-        resp.getWriter().println("<td>" + prices + "</td>");
+        resp.getWriter().println("<td>" + prixByAnnonce.get(key).get(0).getText() + "</td>");
+        resp.getWriter().println(
+            "<td>" + priceString.toString().replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "") + "</td>");
         resp.getWriter().println("</tr>");
       }
       resp.getWriter().println("</tbody>");
