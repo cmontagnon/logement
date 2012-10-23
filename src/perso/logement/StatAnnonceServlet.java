@@ -43,9 +43,11 @@ public class StatAnnonceServlet extends HttpServlet {
     resp.getWriter().println("<html>");
     resp.getWriter().println("<head>");
     resp.getWriter().println("<link type=\"text/css\" rel=\"stylesheet\" href=\"/stylesheets/main.css\" />");
+    resp.getWriter().println("<script src=\"js/sorttable.js\"></script>");
+    addComboboxJavaScript(resp, quartierParameter);
     resp.getWriter().println("</head>");
 
-    resp.getWriter().println("<body>");
+    resp.getWriter().println("<body onload='arrondissementChange()'>");
 
     resp.getWriter().println("<form action=\"/stats\" method=\"get\">");
     // start date filter
@@ -54,21 +56,26 @@ public class StatAnnonceServlet extends HttpServlet {
             + (startDateParameter == null ? "" : startDateParameter) + "\"/></div>");
 
     // arrondissement filter
+    resp.getWriter().println("<div>Arrondissement :");
     resp.getWriter().println(
-        "<div>Arrondissement :<select name=\"arrondissement\" value=\"" + arrondissementParameter + "\">");
-    resp.getWriter().println("<option/>");
+        "<select id=\"arrondissement\" name=\"arrondissement\""
+            + (arrondissementParameter == null ? "" : " value=\"" + arrondissementParameter + "\"")
+            + " onchange=\"arrondissementChange();\">");
+    resp.getWriter().println("<option></option>");
     for (Short arrondissement : SeLogerUtils.arrondissements.keySet()) {
+      boolean isArrondissementSelected =
+          arrondissementParameter != null && arrondissementParameter.equals(arrondissement.toString());
       resp.getWriter().println(
-          "<option value=\"" + arrondissement + "\" + "
-              + (arrondissementParameter.equals(arrondissement.toString()) ? "selected=\"selected\"" : "") + ">"
+          "<option value=\"" + arrondissement + "\"" + (isArrondissementSelected ? " selected=\"selected\"" : "") + ">"
               + arrondissement + "</option>");
     }
     resp.getWriter().println("</select>");
+    resp.getWriter().println("</div>");
 
     // quartier filter
     resp.getWriter().println(
-        "<div>Quartier :<input name=\"quartier\" value=\"" + (quartierParameter == null ? "" : quartierParameter)
-            + "\"/></div>");
+        "<div>Quartier :<select id=\"quartier\" name=\"quartier\""
+            + (quartierParameter == null ? "" : " value=\"" + quartierParameter + "\"") + "></select></div>");
     resp.getWriter().println("<div><input type=\"submit\" value=\"Submit\" /></div>");
     resp.getWriter().println("</form>");
 
@@ -120,9 +127,9 @@ public class StatAnnonceServlet extends HttpServlet {
             filteredPrixByAnnonce.put(annonceKey, prixByAnnonce.get(annonceKey));
           }
         }
-        resp.getWriter().println("<table id=\"table-3\">");
+        resp.getWriter().println("<table id=\"table-3\" class=\"sortable\">");
         resp.getWriter().println("<thead>");
-        resp.getWriter().println("<th><b>Reference</a></b></th>");
+        resp.getWriter().println("<th><b>Reference</b></th>");
         resp.getWriter().println("<th><b>Superficie</b></th>");
         resp.getWriter().println("<th><b>Arrondissement</b></th>");
         resp.getWriter().println("<th><b>Quartier</b></th>");
@@ -149,10 +156,60 @@ public class StatAnnonceServlet extends HttpServlet {
         }
         resp.getWriter().println("</tbody>");
         resp.getWriter().println("</table>");
-        resp.getWriter().println("</html></body>");
+        resp.getWriter().println("</body>");
+        resp.getWriter().println("</html>");
       } finally {
         em.close();
       }
     }
+  }
+
+  private static void addComboboxJavaScript(HttpServletResponse resp, String quartierParameter) throws IOException {
+    resp.getWriter().println("<script type=\"text/javascript\">");
+    resp.getWriter().println("function arrondissementChange() {");
+
+    for (Short arrondissement : arrondissements.keySet()) {
+      Map<String, String> quartiersMap = arrondissements.get(arrondissement);
+      resp.getWriter().println("var seLoger" + arrondissement + "=new Array();");
+      resp.getWriter().println("var humanReadable" + arrondissement + "=new Array();");
+      int i = 0;
+      for (String selogerQuartier : quartiersMap.keySet()) {
+        resp.getWriter().println("seLoger" + arrondissement + "[" + i + "] = \"" + selogerQuartier + "\";");
+        resp.getWriter().println(
+            "humanReadable" + arrondissement + "[" + i + "] = \"" + quartiersMap.get(selogerQuartier) + "\";");
+        i++;
+      }
+    }
+    resp.getWriter().println("");
+
+    resp.getWriter().println("var selectedBoxValue = document.getElementById('arrondissement').value;");
+    resp.getWriter().println("var i;");
+    resp.getWriter().println("var j;");
+    resp.getWriter().println("var nbQuartiers = eval('seLoger' + selectedBoxValue + '.length');");
+    resp.getWriter().println("removeSelectboxOption();");
+    resp.getWriter().println("for (i = 0; i < document.getElementById('arrondissement').options.length; i++) {");
+    resp.getWriter().println("if (selectedBoxValue == document.getElementById('arrondissement').options[i].value) {");
+
+    resp.getWriter().println(
+        "document.getElementById('quartier').options[0] = new Option('All', '', false, "
+            + (isEmpty(quartierParameter) ? "true" : false) + ");");
+
+    resp.getWriter().println("for (j=0; j<nbQuartiers; j++) {");
+    resp.getWriter().println("document.getElementById('quartier').options[j+1] = new Option(");
+    resp.getWriter()
+        .println(
+            "eval('humanReadable' + selectedBoxValue)[j], eval('seLoger' + selectedBoxValue)[j], false, eval(eval('seLoger' + selectedBoxValue)[j]=='"
+                + quartierParameter + "'))");
+    resp.getWriter().println("}");
+    resp.getWriter().println("}");
+    resp.getWriter().println("}");
+    resp.getWriter().println("}");
+    resp.getWriter().println("function removeSelectboxOption() {");
+    resp.getWriter().println("var i;");
+    resp.getWriter().println("for (i = 0; i < document.getElementById('quartier').options.length; i++) {");
+    resp.getWriter().println("document.getElementById('quartier').remove(i);");
+    resp.getWriter().println("}");
+    resp.getWriter().println("}");
+    resp.getWriter().println("</script>");
   }
 }

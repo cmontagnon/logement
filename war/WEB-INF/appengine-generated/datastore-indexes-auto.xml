@@ -1,17 +1,17 @@
-<!-- Indices written at Fri, 19 Oct 2012 14:56:44 UTC -->
+<!-- Indices written at Tue, 23 Oct 2012 11:38:26 UTC -->
 
 <datastore-indexes>
 
-    <!-- Used 2 times in query history -->
+    <!-- Used 26 times in query history -->
     <datastore-index kind="Annonce" ancestor="false" source="auto">
         <property name="arrondissement" direction="asc"/>
-        <property name="quartier" direction="asc"/>
         <property name="date" direction="asc"/>
     </datastore-index>
 
-    <!-- Used 7 times in query history -->
+    <!-- Used 9 times in query history -->
     <datastore-index kind="Annonce" ancestor="false" source="auto">
         <property name="arrondissement" direction="asc"/>
+        <property name="quartier" direction="asc"/>
         <property name="date" direction="asc"/>
     </datastore-index>
 

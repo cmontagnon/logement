@@ -46,32 +46,34 @@ public class FeedAnnonceServlet extends HttpServlet {
     if (req.getParameter("nbPieces") != null) {
       nbPieces = parseInt(req.getParameter("nbPieces"));
     }
-    startProcess(arrondissement, quartier, nbPieces);
+    int nbAnnonceFeeded = startProcess(arrondissement, quartier, nbPieces);
     resp.setContentType("text/plain");
-    resp.getWriter().println("Hello, world");
+    resp.getWriter().println(nbAnnonceFeeded + " annonces ont été enregistrées");
   }
 
   // idq correspond au quartier...
   private static String selogerUrl =
       "http://www.seloger.com/recherche.htm?ci=7501{arrondissement}&idq={quartier}&idqfix=1&idtt=2&idtypebien=1&pxbtw=NaN%2fNaN&surfacebtw=NaN%2fNaN&tri=a_px&BCLANNpg=";
 
-  public void startProcess(short arrondissement, String quartier, Integer nbPiecesSpecifiedByUser) throws IOException {
+  public int startProcess(short arrondissement, String quartier, Integer nbPiecesSpecifiedByUser) throws IOException {
     log.log(Level.INFO, "Feeding arrondissement " + arrondissement);
     log.log(Level.INFO, "Feeding quartier " + quartier);
     Document firstPage = download(1, arrondissement, quartier, nbPiecesSpecifiedByUser);
+    int nbAnnonceFeeded = 0;
     if (nbPiecesSpecifiedByUser == null && doesPageContainTooManyAnnonces(firstPage)) {
       for (int nbPieces = 1; nbPieces <= 5; nbPieces++) {
-        processOnePieceType(arrondissement, quartier, nbPieces);
+        nbAnnonceFeeded += processOnePieceType(arrondissement, quartier, nbPieces);
       }
     } else {
-      processOnePieceType(arrondissement, quartier, nbPiecesSpecifiedByUser);
+      nbAnnonceFeeded += processOnePieceType(arrondissement, quartier, nbPiecesSpecifiedByUser);
     }
-
+    return nbAnnonceFeeded;
   }
 
-  private static void processOnePieceType(short arrondissement, String quartier, Integer nbPieces) throws IOException {
+  private static int processOnePieceType(short arrondissement, String quartier, Integer nbPieces) throws IOException {
     int currentPage = 0;
-    Set<Annonce> annonces;
+    int nbAnnonces = 0;
+    Set<Annonce> annonces = newHashSet();
     do {
       currentPage++;
       log.log(Level.INFO, "Parsing page " + currentPage);
@@ -80,12 +82,14 @@ public class FeedAnnonceServlet extends HttpServlet {
         doc = download(currentPage, arrondissement, quartier, nbPieces);
       }
       annonces = parsePage(doc, arrondissement, quartier);
+      nbAnnonces += annonces.size();
       persistAnnonces(annonces);
       log.log(Level.INFO, "nb annonces in page " + currentPage + ": " + annonces.size());
       for (Annonce annonce : annonces) {
         log.log(Level.INFO, annonce.toString());
       }
     } while (!annonces.isEmpty());
+    return nbAnnonces;
   }
 
   private static void persistAnnonces(Set<Annonce> annonces) {
