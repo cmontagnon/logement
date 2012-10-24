@@ -2,13 +2,13 @@ package perso.logement;
 
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Lists.newArrayList;
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Maps.newHashMap;
-import static com.google.appengine.labs.repackaged.com.google.common.collect.Sets.newHashSet;
+import static org.datanucleus.util.StringUtils.isEmpty;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -26,6 +26,8 @@ public class QueryAnnonceServlet extends HttpServlet {
   private static final EntityManagerFactory emfInstance = Persistence
       .createEntityManagerFactory("transactions-optional");
 
+  @Override
+  @SuppressWarnings({"unchecked", "cast"})
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     resp.setContentType("text/plain");
     EntityManager em = emfInstance.createEntityManager();
@@ -48,13 +50,13 @@ public class QueryAnnonceServlet extends HttpServlet {
         }
       }
 
-      if (req.getParameter("reference") != null) {
+      String referenceParameter = req.getParameter("reference");
+      if (!isEmpty(referenceParameter)) {
         queryString.append(" " + (whereClauseCreated ? "and" : "where") + " reference='");
-        queryString.append(req.getParameter("reference"));
+        queryString.append(referenceParameter);
         queryString.append("'");
       }
 
-      //queryString.append(" group by reference, superficie, arrondissement, quartier");
       queryString.append(" order by date asc");
       Query query = em.createQuery(queryString.toString());
       query.setMaxResults(1000);
@@ -70,8 +72,39 @@ public class QueryAnnonceServlet extends HttpServlet {
       // HTML
       resp.setContentType("text/html");
       resp.getWriter().println("<html>");
+
       resp.getWriter().println("<head>");
       resp.getWriter().println("<link type=\"text/css\" rel=\"stylesheet\" href=\"/stylesheets/main.css\" />");
+      if (!isEmpty(referenceParameter)) {
+        resp.getWriter().println("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
+        resp.getWriter().println("<script type=\"text/javascript\">");
+
+        resp.getWriter().println("google.load(\"visualization\", \"1\", {packages:[\"corechart\"]});");
+        resp.getWriter().println("google.setOnLoadCallback(drawChart);");
+        resp.getWriter().println("function drawChart() {");
+        resp.getWriter().println("var data = new google.visualization.DataTable();");
+        resp.getWriter().println("data.addColumn('date', 'date');");
+        resp.getWriter().println("data.addColumn('number', 'prix');");
+
+        StringBuilder builder = new StringBuilder("[");
+        for (Annonce annonce : annonces) {
+          Calendar cal = Calendar.getInstance();
+          cal.setTimeInMillis(annonce.getDate().getTime());
+          int year = cal.get(Calendar.YEAR);
+          int month = cal.get(Calendar.MONTH) + 1;
+          int day = cal.get(Calendar.DAY_OF_MONTH);
+          builder.append("[new Date(" + year + "," + month + "," + day + ")," + annonce.getPrix() + "],");
+        }
+        builder.append("]");
+        resp.getWriter().println("data.addRows(" + builder.toString() + ");");
+        resp.getWriter().println("var options = {width: 1000, height: 600};");
+        resp.getWriter().println(
+            "var chart = new google.visualization.LineChart(document.getElementById('chart_div'));");
+        resp.getWriter().println("chart.draw(data, options);");
+        resp.getWriter().println("}");
+
+        resp.getWriter().println("</script>");
+      }
       resp.getWriter().println("</head>");
 
       resp.getWriter().println("<body>");
@@ -98,7 +131,6 @@ public class QueryAnnonceServlet extends HttpServlet {
 
       resp.getWriter().println("<tbody>");
       for (AnnonceKey key : prixByAnnonce.keySet()) {
-        Set<Double> uniquePrices = newHashSet();
         List<Annonce> relatedAnnonces = prixByAnnonce.get(key);
         List<Double> prices = newArrayList();
         List<String> priceString = newArrayList();
@@ -110,15 +142,7 @@ public class QueryAnnonceServlet extends HttpServlet {
           }
           previousPrice = annonce.getPrix();
         }
-        uniquePrices.addAll(prices);
-        if (uniquePrices.size() > 1) {
-          double lastPrice = prices.get(prices.size() - 1);
-          double beforeLastPrice = prices.get(prices.size() - 2);
-          resp.getWriter().println("<tr class=\"greenCell\">");
-
-        } else {
-          resp.getWriter().println("<tr>");
-        }
+        resp.getWriter().println("<tr>");
         resp.getWriter().println("<td>" + key.getReference() + "</td>");
         resp.getWriter().println("<td>" + key.getSuperficie() + "</td>");
         resp.getWriter().println("<td>" + key.getArrondissement() + "</td>");
@@ -130,7 +154,10 @@ public class QueryAnnonceServlet extends HttpServlet {
       }
       resp.getWriter().println("</tbody>");
       resp.getWriter().println("</table>");
-      resp.getWriter().println("</html></body>");
+      if (!isEmpty(referenceParameter)) {
+        resp.getWriter().println("<div id=\"chart_div\"></div> ");
+      }
+      resp.getWriter().println("</body></html>");
     } finally {
       em.close();
     }

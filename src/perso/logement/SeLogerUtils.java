@@ -20,14 +20,27 @@ public class SeLogerUtils {
     quartier10.put("133096", "Porte Saint-Denis/Paradis");
     arrondissements.put(new Short("10"), quartier10);
 
+    // Arrondissement 12
+    Map<String, String> quartier12 = newHashMap();
+    quartier12.put("133102", "Aligre/Gare de Lyon");
+    quartier12.put("133103", "Bercy");
+    quartier12.put("133104", "Jardin de Reuilly");
+    quartier12.put("133105", "Nation/Picpus");
+    quartier12.put("133106", "Vallée de Fécamp");
+    quartier12.put("133107", "Bel-Air Sud");
+    quartier12.put("133108", "Bel-Air Nord");
+    quartier12.put("133759", "Bois de Vincennes");
+    quartier12.put("133764", "Seine et Berges");
+    arrondissements.put(new Short("12"), quartier12);
+
     // Arrondissement 18
     Map<String, String> quartier18 = newHashMap();
     quartier18.put("133146", "Moskowa/Porte Montmartre/Porte de Clignancourt");
     quartier18.put("133147", "Grandes Carrières/Clichy");
     quartier18.put("133148", "Clignacourt/Jules Joffrin");
     quartier18.put("133149", "Montmartre");
-    quartier18.put("133150", "Amiraux/Simplon-Poissonniers"); // OK
-    quartier18.put("133151", "Charles/Hermite/Evangile"); // OK
+    quartier18.put("133150", "Amiraux/Simplon-Poissonniers");
+    quartier18.put("133151", "Charles/Hermite/Evangile");
     quartier18.put("133152", "La Chapelle/Marx Dormoy");
     quartier18.put("133153", "Goutte d'or/Château Rouge");
     arrondissements.put(new Short("18"), quartier18);

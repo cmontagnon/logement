@@ -2,6 +2,7 @@ package perso.logement;
 
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Lists.newArrayList;
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Maps.newHashMap;
+import static com.google.appengine.labs.repackaged.com.google.common.collect.Sets.newHashSet;
 import static java.lang.Integer.parseInt;
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR_OF_DAY;
@@ -10,12 +11,17 @@ import static java.util.Calendar.MINUTE;
 import static java.util.Calendar.MONTH;
 import static java.util.Calendar.YEAR;
 import static org.datanucleus.util.StringUtils.isEmpty;
+import static perso.logement.AnnonceEvolution.DOWN;
+import static perso.logement.AnnonceEvolution.NONE;
+import static perso.logement.AnnonceEvolution.UP;
 import static perso.logement.SeLogerUtils.arrondissements;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -28,6 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class StatAnnonceServlet extends HttpServlet {
 
+  private static final String ANNONCES_WITH_PRICE_CHANGE_ONLY = "priceFallOnly";
+  private static final String ALL_ANNONCES = "all";
   private static final EntityManagerFactory emfInstance = Persistence
       .createEntityManagerFactory("transactions-optional");
 
@@ -37,6 +45,7 @@ public class StatAnnonceServlet extends HttpServlet {
     String startDateParameter = req.getParameter("startDate");
     String arrondissementParameter = req.getParameter("arrondissement");
     String quartierParameter = req.getParameter("quartier");
+    String queryTypeParameter = req.getParameter("queryType");
 
     resp.setContentType("text/plain");
     resp.setContentType("text/html");
@@ -51,34 +60,22 @@ public class StatAnnonceServlet extends HttpServlet {
 
     resp.getWriter().println("<form action=\"/stats\" method=\"get\">");
     // start date filter
-    resp.getWriter().println(
-        "<div>Date de début :<input name=\"startDate\" value=\""
-            + (startDateParameter == null ? "" : startDateParameter) + "\"/></div>");
+    addStartDateFilter(resp, startDateParameter);
 
     // arrondissement filter
-    resp.getWriter().println("<div>Arrondissement :");
-    resp.getWriter().println(
-        "<select id=\"arrondissement\" name=\"arrondissement\""
-            + (arrondissementParameter == null ? "" : " value=\"" + arrondissementParameter + "\"")
-            + " onchange=\"arrondissementChange();\">");
-    resp.getWriter().println("<option></option>");
-    for (Short arrondissement : SeLogerUtils.arrondissements.keySet()) {
-      boolean isArrondissementSelected =
-          arrondissementParameter != null && arrondissementParameter.equals(arrondissement.toString());
-      resp.getWriter().println(
-          "<option value=\"" + arrondissement + "\"" + (isArrondissementSelected ? " selected=\"selected\"" : "") + ">"
-              + arrondissement + "</option>");
-    }
-    resp.getWriter().println("</select>");
-    resp.getWriter().println("</div>");
+    addArrondissementFilter(resp, arrondissementParameter);
 
     // quartier filter
-    resp.getWriter().println(
-        "<div>Quartier :<select id=\"quartier\" name=\"quartier\""
-            + (quartierParameter == null ? "" : " value=\"" + quartierParameter + "\"") + "></select></div>");
+    addQuartierFilter(resp, quartierParameter);
+
+    // Query type filter
+    addQueryTypeFilter(resp, queryTypeParameter);
+
+    // Close the form
     resp.getWriter().println("<div><input type=\"submit\" value=\"Submit\" /></div>");
     resp.getWriter().println("</form>");
 
+    // Query database
     if (!isEmpty(startDateParameter)) {
       EntityManager em = emfInstance.createEntityManager();
       try {
@@ -120,13 +117,37 @@ public class StatAnnonceServlet extends HttpServlet {
             prixByAnnonce.put(annonce.getKey(), prices);
           }
         }
-        // We remove annonces with only one price
+
         Map<AnnonceKey, List<Double>> filteredPrixByAnnonce = newHashMap();
-        for (AnnonceKey annonceKey : prixByAnnonce.keySet()) {
-          if (prixByAnnonce.get(annonceKey).size() > 1) {
+        if (isEmpty(queryTypeParameter) || ANNONCES_WITH_PRICE_CHANGE_ONLY.equals(queryTypeParameter)) {
+          // We remove annonces with only one price
+          for (AnnonceKey annonceKey : prixByAnnonce.keySet()) {
+            if (prixByAnnonce.get(annonceKey).size() > 1) {
+              filteredPrixByAnnonce.put(annonceKey, prixByAnnonce.get(annonceKey));
+            }
+          }
+        } else {
+          // We keep all annonces
+          for (AnnonceKey annonceKey : prixByAnnonce.keySet()) {
             filteredPrixByAnnonce.put(annonceKey, prixByAnnonce.get(annonceKey));
           }
         }
+
+        // We compute the mean price by square meter value
+        double currentPriceBySquareMeterSum = 0;
+        int nbAnnoncesWithNullSuperficie = 0;
+        for (AnnonceKey key : filteredPrixByAnnonce.keySet()) {
+          List<Double> prices = filteredPrixByAnnonce.get(key);
+          if (key.getSuperficie() != 0) {
+            currentPriceBySquareMeterSum += (prices.get(prices.size() - 1)) / key.getSuperficie();
+          } else {
+            nbAnnoncesWithNullSuperficie++;
+          }
+        }
+        int meanPriceBySquareMeter =
+            (int) (currentPriceBySquareMeterSum / (filteredPrixByAnnonce.size() - nbAnnoncesWithNullSuperficie));
+
+        // We build the HTML table
         resp.getWriter().println("<table id=\"table-3\" class=\"sortable\">");
         resp.getWriter().println("<thead>");
         resp.getWriter().println("<th><b>Reference</b></th>");
@@ -135,23 +156,46 @@ public class StatAnnonceServlet extends HttpServlet {
         resp.getWriter().println("<th><b>Quartier</b></th>");
         resp.getWriter().println("<th><b>Prix</b></th>");
         resp.getWriter().println("<th><b>Prix/m²</b></th>");
+        resp.getWriter().println("<th><b>Moyenne</b></th>");
         resp.getWriter().println("</thead>");
 
         resp.getWriter().println("<tbody>");
         for (AnnonceKey key : filteredPrixByAnnonce.keySet()) {
           List<Double> prices = filteredPrixByAnnonce.get(key);
-          List<Long> pricesByQuareMeter = newArrayList();
+          List<Long> pricesBySquareMeter = newArrayList();
           for (Double price : prices) {
-            pricesByQuareMeter.add(Math.round(price / key.getSuperficie()));
+            if (key.getSuperficie() != 0) {
+              pricesBySquareMeter.add(Math.round(price / key.getSuperficie()));
+            }
           }
-          resp.getWriter().println("<tr class=\"greenCell\">");
+          AnnonceEvolution annonceEvolution = getAnnonceEvolution(prices);
+          String priceEvolImage = null;
+          switch (annonceEvolution) {
+            case DOWN:
+              priceEvolImage = "<img src=\"icons/down.png\">";
+              break;
+            case UP:
+              priceEvolImage = "<img src=\"icons/up.png\">";
+              break;
+            default:
+              priceEvolImage = "";
+          }
+          String meanTagImage = "";
+          if (!pricesBySquareMeter.isEmpty()) { // It may be empty when the superficie is equal to 0
+            meanTagImage =
+                meanPriceBySquareMeter >= pricesBySquareMeter.get(pricesBySquareMeter.size() - 1) ? "<img src=\"icons/green.png\">"
+                    : "<img src=\"icons/red.png\">";
+          }
+
+          resp.getWriter().println("<tr>");
           resp.getWriter().println(
               "<td><a href=\"/query?reference=" + key.getReference() + "\">" + key.getReference() + "</a></td>");
           resp.getWriter().println("<td>" + key.getSuperficie() + "</td>");
           resp.getWriter().println("<td>" + key.getArrondissement() + "</td>");
           resp.getWriter().println("<td>" + key.getQuartier() + "</td>");
-          resp.getWriter().println("<td>" + prices + "</td>");
-          resp.getWriter().println("<td>" + pricesByQuareMeter + "</td>");
+          resp.getWriter().println("<td>" + prices + priceEvolImage + "</td>");
+          resp.getWriter().println("<td>" + pricesBySquareMeter + "</td>");
+          resp.getWriter().println("<td>" + meanPriceBySquareMeter + meanTagImage + "</td>");
           resp.getWriter().println("</tr>");
         }
         resp.getWriter().println("</tbody>");
@@ -160,6 +204,80 @@ public class StatAnnonceServlet extends HttpServlet {
         resp.getWriter().println("</html>");
       } finally {
         em.close();
+      }
+    }
+  }
+
+  private static void addStartDateFilter(HttpServletResponse resp, String startDateParameter) throws IOException {
+    resp.getWriter().println(
+        "<div>Date de début :<input name=\"startDate\" value=\""
+            + (startDateParameter == null ? "" : startDateParameter) + "\"/></div>");
+  }
+
+  private static void addQueryTypeFilter(HttpServletResponse resp, String queryTypeParameter) throws IOException {
+    resp.getWriter().println(
+        "<div>Annonce évolution :<select id=\"queryType\" name=\"queryType\""
+            + (queryTypeParameter == null ? "" : " value=\"" + queryTypeParameter + "\"") + ">");
+    resp.getWriter()
+        .println(
+            "<option value='"
+                + ANNONCES_WITH_PRICE_CHANGE_ONLY
+                + "'"
+                + (queryTypeParameter != null && queryTypeParameter.equals(ANNONCES_WITH_PRICE_CHANGE_ONLY) ? " selected='true'"
+                    : "") + ">Seulement celles dont le prix change</option>");
+    resp.getWriter().println(
+        "<option value='" + ALL_ANNONCES + "'"
+            + (queryTypeParameter != null && queryTypeParameter.equals(ALL_ANNONCES) ? " selected='true'" : "")
+            + ">Toutes</option>");
+    resp.getWriter().println("</select></div>");
+  }
+
+  private static void addQuartierFilter(HttpServletResponse resp, String quartierParameter) throws IOException {
+    resp.getWriter().println(
+        "<div>Quartier :<select id=\"quartier\" name=\"quartier\""
+            + (quartierParameter == null ? "" : " value=\"" + quartierParameter + "\"") + "></select></div>");
+  }
+
+  private static void addArrondissementFilter(HttpServletResponse resp, String arrondissementParameter)
+      throws IOException {
+    resp.getWriter().println("<div>Arrondissement :");
+    resp.getWriter().println(
+        "<select id=\"arrondissement\" name=\"arrondissement\""
+            + (arrondissementParameter == null ? "" : " value=\"" + arrondissementParameter + "\"")
+            + " onchange=\"arrondissementChange();\">");
+    resp.getWriter().println("<option></option>");
+    List<Short> arrondissementsList = newArrayList(SeLogerUtils.arrondissements.keySet());
+    Collections.sort(arrondissementsList);
+    for (Short arrondissement : arrondissementsList) {
+      boolean isArrondissementSelected =
+          arrondissementParameter != null && arrondissementParameter.equals(arrondissement.toString());
+      resp.getWriter().println(
+          "<option value=\"" + arrondissement + "\"" + (isArrondissementSelected ? " selected=\"selected\"" : "") + ">"
+              + arrondissement + "</option>");
+    }
+    resp.getWriter().println("</select>");
+    resp.getWriter().println("</div>");
+  }
+
+  private static AnnonceEvolution getAnnonceEvolution(List<Double> prices) {
+    Set<Double> distinctPrices = newHashSet(prices);
+    if (distinctPrices.size() == 1) {
+      return NONE;
+    } else {
+      double lastPrice = prices.get(prices.size() - 1);
+      double lastButOnePrice = Double.NaN;
+      for (int i = prices.size() - 2; i >= 0; i--) { // We start with the last but one price
+        if (prices.get(i) != lastPrice) {
+          lastButOnePrice = prices.get(i);
+          break; // TODO : moche...
+        }
+      }
+      if (lastPrice == lastButOnePrice) {
+        return NONE;
+      } else if (lastPrice > lastButOnePrice) {
+        return UP;
+      } else {
+        return DOWN;
       }
     }
   }
@@ -173,10 +291,12 @@ public class StatAnnonceServlet extends HttpServlet {
       resp.getWriter().println("var seLoger" + arrondissement + "=new Array();");
       resp.getWriter().println("var humanReadable" + arrondissement + "=new Array();");
       int i = 0;
-      for (String selogerQuartier : quartiersMap.keySet()) {
-        resp.getWriter().println("seLoger" + arrondissement + "[" + i + "] = \"" + selogerQuartier + "\";");
+      List<String> selogerFormatQuartierList = newArrayList(quartiersMap.keySet());
+      Collections.sort(selogerFormatQuartierList);
+      for (String selogerFormatQuartier : selogerFormatQuartierList) {
+        resp.getWriter().println("seLoger" + arrondissement + "[" + i + "] = \"" + selogerFormatQuartier + "\";");
         resp.getWriter().println(
-            "humanReadable" + arrondissement + "[" + i + "] = \"" + quartiersMap.get(selogerQuartier) + "\";");
+            "humanReadable" + arrondissement + "[" + i + "] = \"" + quartiersMap.get(selogerFormatQuartier) + "\";");
         i++;
       }
     }

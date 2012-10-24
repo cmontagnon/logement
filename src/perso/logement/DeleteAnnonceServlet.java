@@ -19,6 +19,7 @@ public class DeleteAnnonceServlet extends HttpServlet {
 
   private static final Logger log = Logger.getLogger(DeleteAnnonceServlet.class.getName());
 
+  @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     int year = parseInt(req.getParameter("year"));

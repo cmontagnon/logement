@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class AddAnnonceServlet extends HttpServlet {
 
+  @Override
   public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     String reference = req.getParameter("reference");
