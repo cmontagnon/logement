@@ -4,6 +4,7 @@ import static com.google.appengine.labs.repackaged.com.google.common.collect.Lis
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Maps.newHashMap;
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Sets.newHashSet;
 import static java.lang.Integer.parseInt;
+import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MILLISECOND;
@@ -17,8 +18,10 @@ import static perso.logement.AnnonceEvolution.UP;
 import static perso.logement.SeLogerUtils.arrondissements;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +34,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.math.util.MathUtils;
+
 @SuppressWarnings("serial")
 public class StatAnnonceServlet extends HttpServlet {
 
@@ -38,6 +43,7 @@ public class StatAnnonceServlet extends HttpServlet {
   private static final String ALL_ANNONCES = "all";
   private static final EntityManagerFactory emfInstance = Persistence
       .createEntityManagerFactory("transactions-optional");
+  private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
   @SuppressWarnings({"cast", "unchecked"})
   @Override
@@ -105,7 +111,10 @@ public class StatAnnonceServlet extends HttpServlet {
 
         // HTML
         Map<AnnonceKey, List<Double>> prixByAnnonce = newHashMap();
+        Map<AnnonceKey, List<Date>> datesByAnnonce = newHashMap();
+        Date maxDate = null;
         for (Annonce annonce : resultList) {
+          // prix
           if (prixByAnnonce.containsKey(annonce.getKey())) {
             List<Double> prices = prixByAnnonce.get(annonce.getKey());
             if (!prices.get(prices.size() - 1).equals(annonce.getPrix())) {
@@ -116,20 +125,38 @@ public class StatAnnonceServlet extends HttpServlet {
             prices.add(annonce.getPrix());
             prixByAnnonce.put(annonce.getKey(), prices);
           }
+          // dates
+          if (datesByAnnonce.containsKey(annonce.getKey())) {
+            List<Date> dates = datesByAnnonce.get(annonce.getKey());
+            if (!dates.get(dates.size() - 1).equals(annonce.getDate())) {
+              dates.add(annonce.getDate());
+            }
+          } else {
+            List<Date> dates = newArrayList();
+            dates.add(annonce.getDate());
+            datesByAnnonce.put(annonce.getKey(), dates);
+          }
+          // max date
+          if (maxDate == null || maxDate.compareTo(annonce.getDate()) < 0) {
+            maxDate = annonce.getDate();
+          }
         }
 
         Map<AnnonceKey, List<Double>> filteredPrixByAnnonce = newHashMap();
+        Map<AnnonceKey, List<Date>> filteredDateByAnnonce = newHashMap();
         if (isEmpty(queryTypeParameter) || ANNONCES_WITH_PRICE_CHANGE_ONLY.equals(queryTypeParameter)) {
           // We remove annonces with only one price
           for (AnnonceKey annonceKey : prixByAnnonce.keySet()) {
             if (prixByAnnonce.get(annonceKey).size() > 1) {
               filteredPrixByAnnonce.put(annonceKey, prixByAnnonce.get(annonceKey));
+              filteredDateByAnnonce.put(annonceKey, datesByAnnonce.get(annonceKey));
             }
           }
         } else {
           // We keep all annonces
           for (AnnonceKey annonceKey : prixByAnnonce.keySet()) {
             filteredPrixByAnnonce.put(annonceKey, prixByAnnonce.get(annonceKey));
+            filteredDateByAnnonce.put(annonceKey, datesByAnnonce.get(annonceKey));
           }
         }
 
@@ -147,6 +174,8 @@ public class StatAnnonceServlet extends HttpServlet {
         int meanPriceBySquareMeter =
             (int) (currentPriceBySquareMeterSum / (filteredPrixByAnnonce.size() - nbAnnoncesWithNullSuperficie));
 
+        resp.getWriter().println(
+            "<div><span>Moyenne du prix au m² pour cette requête : " + meanPriceBySquareMeter + "</span></div>");
         // We build the HTML table
         resp.getWriter().println("<table id=\"table-3\" class=\"sortable\">");
         resp.getWriter().println("<thead>");
@@ -156,7 +185,8 @@ public class StatAnnonceServlet extends HttpServlet {
         resp.getWriter().println("<th><b>Quartier</b></th>");
         resp.getWriter().println("<th><b>Prix</b></th>");
         resp.getWriter().println("<th><b>Prix/m²</b></th>");
-        resp.getWriter().println("<th><b>Moyenne</b></th>");
+        resp.getWriter().println("<th><b>Différence à la moyenne (en %)</b></th>");
+        resp.getWriter().println("<th><b>Lien</b></th>");
         resp.getWriter().println("</thead>");
 
         resp.getWriter().println("<tbody>");
@@ -168,23 +198,34 @@ public class StatAnnonceServlet extends HttpServlet {
               pricesBySquareMeter.add(Math.round(price / key.getSuperficie()));
             }
           }
-          AnnonceEvolution annonceEvolution = getAnnonceEvolution(prices);
-          String priceEvolImage = null;
-          switch (annonceEvolution) {
-            case DOWN:
-              priceEvolImage = "<img src=\"icons/down.png\">";
-              break;
-            case UP:
-              priceEvolImage = "<img src=\"icons/up.png\">";
-              break;
-            default:
-              priceEvolImage = "";
-          }
+          String priceEvolImage = getPriceEvolImage(prices);
+
           String meanTagImage = "";
+          double meanTagPercentage = 0;
           if (!pricesBySquareMeter.isEmpty()) { // It may be empty when the superficie is equal to 0
+            Long lastPriceBySquareMeter = pricesBySquareMeter.get(pricesBySquareMeter.size() - 1);
             meanTagImage =
-                meanPriceBySquareMeter >= pricesBySquareMeter.get(pricesBySquareMeter.size() - 1) ? "<img src=\"icons/green.png\">"
+                meanPriceBySquareMeter >= lastPriceBySquareMeter ? "<img src=\"icons/green.png\">"
                     : "<img src=\"icons/red.png\">";
+            if (meanPriceBySquareMeter != 0) {
+              meanTagPercentage =
+                  MathUtils.round(100 * new Double(lastPriceBySquareMeter - meanPriceBySquareMeter)
+                      / meanPriceBySquareMeter, 2, ROUND_HALF_UP);
+            } else {
+              meanTagPercentage = 0;
+            }
+          }
+
+          // is annonce stale?
+          String lastAnnonceDate =
+              dateFormatter.format(filteredDateByAnnonce.get(key).get(filteredDateByAnnonce.get(key).size() - 1));
+          String annonceStatusImage = "";
+          String maxDateAsString = dateFormatter.format(maxDate);
+          if (!maxDateAsString.equals(lastAnnonceDate)) {
+            // We may assume this annonce doesn't exist anymore
+            annonceStatusImage = "<img src=\"icons/red.png\">";
+          } else {
+            annonceStatusImage = "<img src=\"icons/green.png\">";
           }
 
           resp.getWriter().println("<tr>");
@@ -193,9 +234,13 @@ public class StatAnnonceServlet extends HttpServlet {
           resp.getWriter().println("<td>" + key.getSuperficie() + "</td>");
           resp.getWriter().println("<td>" + key.getArrondissement() + "</td>");
           resp.getWriter().println("<td>" + key.getQuartier() + "</td>");
-          resp.getWriter().println("<td>" + prices + priceEvolImage + "</td>");
+          resp.getWriter().println("<td>" + prices + "&nbsp;" + priceEvolImage + "</td>");
           resp.getWriter().println("<td>" + pricesBySquareMeter + "</td>");
-          resp.getWriter().println("<td>" + meanPriceBySquareMeter + meanTagImage + "</td>");
+          resp.getWriter().println("<td>" + meanTagPercentage + "&nbsp;" + meanTagImage + "</td>");
+          resp.getWriter().println(
+              "<td><a href=\"http://www.seloger.com/recherche.htm?ci=7501" + arrondissementParameter
+                  + "&idtt=2&org=advanced_search&refannonce=" + key.getReference() + "\">seloger</a>"
+                  + annonceStatusImage + "</td>");
           resp.getWriter().println("</tr>");
         }
         resp.getWriter().println("</tbody>");
@@ -206,6 +251,22 @@ public class StatAnnonceServlet extends HttpServlet {
         em.close();
       }
     }
+  }
+
+  private static String getPriceEvolImage(List<Double> prices) {
+    AnnonceEvolution annonceEvolution = getAnnonceEvolution(prices);
+    String priceEvolImage = null;
+    switch (annonceEvolution) {
+      case DOWN:
+        priceEvolImage = "<img src=\"icons/down.png\">";
+        break;
+      case UP:
+        priceEvolImage = "<img src=\"icons/up.png\">";
+        break;
+      default:
+        priceEvolImage = "";
+    }
+    return priceEvolImage;
   }
 
   private static void addStartDateFilter(HttpServletResponse resp, String startDateParameter) throws IOException {
