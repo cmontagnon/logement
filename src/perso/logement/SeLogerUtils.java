@@ -38,11 +38,20 @@ public class SeLogerUtils {
     quartier18.put("133146", "Moskowa/Porte Montmartre/Porte de Clignancourt");
     quartier18.put("133147", "Grandes Carrières/Clichy");
     quartier18.put("133148", "Clignacourt/Jules Joffrin");
-    quartier18.put("133149", "Montmartre");
+    quartier18.put("133149", "Montmartre"); // Too big
     quartier18.put("133150", "Amiraux/Simplon-Poissonniers");
     quartier18.put("133151", "Charles/Hermite/Evangile");
     quartier18.put("133152", "La Chapelle/Marx Dormoy");
     quartier18.put("133153", "Goutte d'or/Château Rouge");
     arrondissements.put(new Short("18"), quartier18);
+
+    // Arrondissement 11
+    Map<String, String> quartier11 = newHashMap();
+    quartier11.put("133097", "Belleville/Saint Maur");
+    quartier11.put("133098", "Republique/Saint Ambroise"); // Too big
+    quartier11.put("133099", "Bastille/Popincourt"); // Too big
+    quartier11.put("133100", "Leon Blum/Folie Regnault"); // Too big
+    quartier11.put("133101", "Nation/Alexandre Dumas");
+    arrondissements.put(new Short("11"), quartier11);
   }
 }

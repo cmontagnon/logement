@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -38,6 +39,8 @@ import org.apache.commons.math.util.MathUtils;
 
 @SuppressWarnings("serial")
 public class StatAnnonceServlet extends HttpServlet {
+
+  private static final Logger log = Logger.getLogger(StatAnnonceServlet.class.getName());
 
   private static final String ANNONCES_WITH_PRICE_CHANGE_ONLY = "priceFallOnly";
   private static final String ALL_ANNONCES = "all";
@@ -141,7 +144,7 @@ public class StatAnnonceServlet extends HttpServlet {
             maxDate = annonce.getDate();
           }
         }
-
+        log.info("Max date : " + maxDate);
         Map<AnnonceKey, List<Double>> filteredPrixByAnnonce = newHashMap();
         Map<AnnonceKey, List<Date>> filteredDateByAnnonce = newHashMap();
         if (isEmpty(queryTypeParameter) || ANNONCES_WITH_PRICE_CHANGE_ONLY.equals(queryTypeParameter)) {
@@ -222,6 +225,7 @@ public class StatAnnonceServlet extends HttpServlet {
           String annonceStatusImage = "";
           String maxDateAsString = dateFormatter.format(maxDate);
           if (!maxDateAsString.equals(lastAnnonceDate)) {
+            log.info("Annonce " + key.getReference() + " is stale. LastAnnonceDate = " + lastAnnonceDate);
             // We may assume this annonce doesn't exist anymore
             annonceStatusImage = "<img src=\"icons/red.png\">";
           } else {

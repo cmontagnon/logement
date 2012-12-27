@@ -55,28 +55,52 @@ public class FeedAnnonceServlet extends HttpServlet {
   private static String selogerUrl =
       "http://www.seloger.com/recherche.htm?ci=7501{arrondissement}&idq={quartier}&idqfix=1&idtt=2&idtypebien=1&pxbtw=NaN%2fNaN&surfacebtw=NaN%2fNaN&tri=a_px&BCLANNpg=";
 
-  public int startProcess(short arrondissement, String quartier, Integer nbPiecesSpecifiedByUser) throws IOException {
-    log.log(Level.INFO, "Feeding arrondissement " + arrondissement);
-    log.log(Level.INFO, "Feeding quartier " + quartier);
-    Document firstPage = download(1, arrondissement, quartier, nbPiecesSpecifiedByUser);
-    int nbAnnonceFeeded = 0;
-    if (nbPiecesSpecifiedByUser == null && doesPageContainTooManyAnnonces(firstPage)) {
+  public int startProcess(short arrondissement, String quartier, Integer nbPiecesSpecifiedByRequest) throws IOException {
+    log.info("startProcess (arrondissement=" + arrondissement + ", quartier=" + quartier + ",nbPieces="
+        + nbPiecesSpecifiedByRequest + ")");
+    Document firstPage = null;
+    while (firstPage == null) {
+      firstPage = download(1, arrondissement, quartier, nbPiecesSpecifiedByRequest);
+    }
+    int nbAnnonceFed = 0;
+    if (nbPiecesSpecifiedByRequest == null && doesRequestContainTooManyAnnonces(firstPage)) {
+      /*
+       * We arrive here when :
+       * - the request doesn't specify a nbPiecesParameter
+       * - the request contains too many announces and we must split it into several little request.
+       * In such a case it's likely the whole request will fail because of the google timeout (1 minute...)
+       */
       for (int nbPieces = 1; nbPieces <= 5; nbPieces++) {
-        nbAnnonceFeeded += processOnePieceType(arrondissement, quartier, nbPieces);
+        nbAnnonceFed += processRequest(arrondissement, quartier, nbPieces);
       }
     } else {
-      nbAnnonceFeeded += processOnePieceType(arrondissement, quartier, nbPiecesSpecifiedByUser);
+      /* We can arrive here in 2 cases :
+       * - nbPiecesSpecifiedByUser is null and the request doesn't contain too many announces
+       * - the request specifies an nbPieces parameter  
+       */
+      nbAnnonceFed += processRequest(arrondissement, quartier, nbPiecesSpecifiedByRequest);
     }
-    return nbAnnonceFeeded;
+    return nbAnnonceFed;
   }
 
-  private static int processOnePieceType(short arrondissement, String quartier, Integer nbPieces) throws IOException {
+  /**
+   * nbPieces may be null while other parameters can't.
+   * @param arrondissement
+   * @param quartier
+   * @param nbPieces
+   * @return
+   * @throws IOException
+   */
+  private static int processRequest(short arrondissement, String quartier, Integer nbPieces) throws IOException {
+    log.info("arrondissement : " + arrondissement);
+    log.info("quartier : " + quartier);
+    log.info("nbPieces : " + nbPieces);
     int currentPage = 0;
     int nbAnnonces = 0;
     Set<Annonce> annonces = newHashSet();
     do {
       currentPage++;
-      log.log(Level.INFO, "Parsing page " + currentPage);
+      log.info("Parsing page " + currentPage);
       Document doc = null;
       while (doc == null) {
         doc = download(currentPage, arrondissement, quartier, nbPieces);
@@ -84,9 +108,9 @@ public class FeedAnnonceServlet extends HttpServlet {
       annonces = parsePage(doc, arrondissement, quartier);
       nbAnnonces += annonces.size();
       persistAnnonces(annonces);
-      log.log(Level.INFO, "nb annonces in page " + currentPage + ": " + annonces.size());
+      log.info("nb annonces in page " + currentPage + ": " + annonces.size());
       for (Annonce annonce : annonces) {
-        log.log(Level.INFO, annonce.toString());
+        log.info(annonce.toString());
       }
     } while (!annonces.isEmpty());
     return nbAnnonces;
@@ -96,7 +120,7 @@ public class FeedAnnonceServlet extends HttpServlet {
     PersistenceManager pm = PMF.get().getPersistenceManager();
     try {
       for (Annonce annonce : annonces) {
-        log.log(Level.INFO, "persisting annonce " + annonce);
+        log.info("persisting annonce " + annonce);
         pm.makePersistent(annonce);
       }
     } finally {
@@ -104,12 +128,18 @@ public class FeedAnnonceServlet extends HttpServlet {
     }
   }
 
-  private static boolean doesPageContainTooManyAnnonces(Document firstPage) {
+  private static boolean doesRequestContainTooManyAnnonces(Document firstPage) {
     Elements nbPagesElement = firstPage.getElementsByClass("rech_nbpage");
     String nbPagesAsString = nbPagesElement.get(0).ownText();
-    int nbPages = parseInt(nbPagesAsString.substring(nbPagesAsString.indexOf("sur") + 4));
+    log.info("nbPagesAsString = " + nbPagesAsString);
+    int nbPages = 1;
+    if (nbPagesAsString.indexOf("sur") != -1) {
+      nbPages = parseInt(nbPagesAsString.substring(nbPagesAsString.indexOf("sur") + 4));
+    }
     // There's too many pages we must add research criteria
-    return nbPages == MAX_PAGE_NUMBER;
+    boolean doesPageContainTooManyAnnonces = nbPages >= MAX_PAGE_NUMBER;
+    log.info("doesRequestContainTooManyAnnonces = " + doesPageContainTooManyAnnonces);
+    return doesPageContainTooManyAnnonces;
   }
 
   public static Set<Annonce> parsePage(Document doc, short arrondissement, String quartier) {
@@ -159,7 +189,7 @@ public class FeedAnnonceServlet extends HttpServlet {
 
   private static Document download(int currentPage, short arrondissement, String quartier, Integer nbPieces)
       throws IOException {
-    log.log(Level.INFO, "downloading page " + currentPage);
+    log.info("downloading page " + currentPage);
 
     URLFetchService fetcher = URLFetchServiceFactory.getURLFetchService();
 
@@ -169,13 +199,13 @@ public class FeedAnnonceServlet extends HttpServlet {
       pageUrl = pageUrl + "&nb_pieces=" + nbPieces;
     }
     URL url = new URL(pageUrl);
-    log.log(Level.INFO, "page url : " + pageUrl);
+    log.info("page url : " + pageUrl);
     try {
       HTTPResponse response = fetcher.fetch(url);
       byte[] content = response.getContent();
       // if redirects are followed, this returns the final URL we are redirected to
       //URL finalUrl = response.getFinalUrl();
-
+      log.info("page successfully retrieved");
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       out.write(content);
       out.flush();
