@@ -18,6 +18,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import perso.logement.client.SeLogerUtils;
+import perso.logement.core.Annonce;
+import perso.logement.core.AnnonceKey;
+
 @SuppressWarnings("serial")
 public class QueryAnnonceServlet extends HttpServlet {
 

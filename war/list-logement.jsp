@@ -4,7 +4,7 @@
 <%@ page import="com.google.appengine.api.users.User" %>
 <%@ page import="com.google.appengine.api.users.UserService" %>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
-<%@ page import="perso.logement.Annonce" %>
+<%@ page import="perso.logement.core.Annonce" %>
 <%@ page import="perso.logement.PMF" %>
 
 <html>

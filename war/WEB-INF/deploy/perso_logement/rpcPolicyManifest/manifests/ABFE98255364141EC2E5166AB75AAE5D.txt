@@ -1,0 +1,2 @@
+serviceClass: perso.logement.client.AnnonceService
+path: 2D8E946C17AB567B38F9964B666993DE.gwt.rpc

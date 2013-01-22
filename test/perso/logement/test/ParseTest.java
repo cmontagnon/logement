@@ -11,8 +11,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.Test;
 
-import perso.logement.Annonce;
 import perso.logement.FeedAnnonceServlet;
+import perso.logement.core.Annonce;
 
 public class ParseTest {
 

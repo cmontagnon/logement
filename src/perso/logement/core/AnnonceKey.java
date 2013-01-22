@@ -1,12 +1,14 @@
-package perso.logement;
+package perso.logement.core;
 
-public class AnnonceKey {
+import java.io.Serializable;
+
+public class AnnonceKey implements Serializable {
   private String reference;
   private double superficie;
-  private double arrondissement;
+  private long arrondissement;
   private String quartier;
 
-  public AnnonceKey(String reference, double superficie, double arrondissement, String quartier) {
+  public AnnonceKey(String reference, double superficie, long arrondissement, String quartier) {
     super();
     this.reference = reference;
     this.superficie = superficie;
@@ -25,11 +27,11 @@ public class AnnonceKey {
     final int prime = 31;
     int result = 1;
     long temp;
-    temp = Double.doubleToLongBits(arrondissement);
+    temp = arrondissement;
     result = prime * result + (int) (temp ^ (temp >>> 32));
     result = prime * result + ((quartier == null) ? 0 : quartier.hashCode());
     result = prime * result + ((reference == null) ? 0 : reference.hashCode());
-    temp = Double.doubleToLongBits(superficie);
+    temp = (long) superficie;
     result = prime * result + (int) (temp ^ (temp >>> 32));
     return result;
   }
@@ -43,7 +45,7 @@ public class AnnonceKey {
     if (getClass() != obj.getClass())
       return false;
     AnnonceKey other = (AnnonceKey) obj;
-    if (Double.doubleToLongBits(arrondissement) != Double.doubleToLongBits(other.arrondissement))
+    if (arrondissement != other.arrondissement)
       return false;
     if (quartier == null) {
       if (other.quartier != null)
@@ -55,7 +57,7 @@ public class AnnonceKey {
         return false;
     } else if (!reference.equals(other.reference))
       return false;
-    if (Double.doubleToLongBits(superficie) != Double.doubleToLongBits(other.superficie))
+    if (superficie != other.superficie)
       return false;
     return true;
   }

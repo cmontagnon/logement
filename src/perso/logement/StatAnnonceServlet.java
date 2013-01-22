@@ -12,10 +12,10 @@ import static java.util.Calendar.MINUTE;
 import static java.util.Calendar.MONTH;
 import static java.util.Calendar.YEAR;
 import static org.datanucleus.util.StringUtils.isEmpty;
-import static perso.logement.AnnonceEvolution.DOWN;
-import static perso.logement.AnnonceEvolution.NONE;
-import static perso.logement.AnnonceEvolution.UP;
-import static perso.logement.SeLogerUtils.arrondissements;
+import static perso.logement.client.SeLogerUtils.arrondissements;
+import static perso.logement.core.AnnonceEvolution.DOWN;
+import static perso.logement.core.AnnonceEvolution.NONE;
+import static perso.logement.core.AnnonceEvolution.UP;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -36,6 +36,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.math.util.MathUtils;
+
+import perso.logement.client.SeLogerUtils;
+import perso.logement.core.Annonce;
+import perso.logement.core.AnnonceEvolution;
+import perso.logement.core.AnnonceKey;
 
 @SuppressWarnings("serial")
 public class StatAnnonceServlet extends HttpServlet {

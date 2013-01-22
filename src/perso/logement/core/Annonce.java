@@ -1,8 +1,8 @@
-package perso.logement;
+package perso.logement.core;
 
 import static javax.persistence.TemporalType.TIMESTAMP;
 
-import java.text.SimpleDateFormat;
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -13,7 +13,9 @@ import javax.persistence.Temporal;
 import javax.persistence.Transient;
 
 @Entity
-public class Annonce {
+public class Annonce implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +29,9 @@ public class Annonce {
   private short arrondissement;
   private String quartier;
 
-  private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+  public Annonce() {
+    super();
+  }
 
   public Annonce(String reference, String text, double prix, double superficie, Date date, short arrondissement,
       String quartier) {
@@ -112,7 +116,7 @@ public class Annonce {
 
   @Override
   public String toString() {
-    return "reference=" + reference + "; superficie=" + superficie + "; prix=" + prix + "; date=" + format.format(date)
-        + "; text=" + text;
+    return "reference=" + reference + "; superficie=" + superficie + "; prix=" + prix + "; date=" + date + "; text="
+        + text;
   }
 }

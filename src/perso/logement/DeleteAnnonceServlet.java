@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import perso.logement.core.Annonce;
+
 @SuppressWarnings("serial")
 public class DeleteAnnonceServlet extends HttpServlet {
 

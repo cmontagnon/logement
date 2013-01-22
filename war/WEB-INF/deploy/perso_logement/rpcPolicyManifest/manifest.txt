@@ -1,0 +1,4 @@
+# Module perso_logement
+# RPC service class, partial path of RPC policy file
+perso.logement.client.AnnonceService, 2D8E946C17AB567B38F9964B666993DE.gwt.rpc
+com.google.gwt.logging.shared.RemoteLoggingService, D981642EFA42F70DEE26F7EF8CAC42EC.gwt.rpc
