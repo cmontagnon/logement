@@ -1,17 +1,10 @@
 package perso.logement.service;
 
 import static com.google.appengine.labs.repackaged.com.google.common.collect.Lists.newArrayList;
-import static java.lang.Integer.parseInt;
-import static java.util.Calendar.DAY_OF_MONTH;
-import static java.util.Calendar.HOUR_OF_DAY;
-import static java.util.Calendar.MILLISECOND;
-import static java.util.Calendar.MINUTE;
-import static java.util.Calendar.MONTH;
-import static java.util.Calendar.YEAR;
 import static org.datanucleus.util.StringUtils.isEmpty;
 import static perso.logement.client.SeLogerUtils.arrondissements;
 
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,11 +29,11 @@ public class AnnonceServiceImpl extends RemoteServiceServlet implements AnnonceS
       .createEntityManagerFactory("transactions-optional");
 
   @Override
-  public List<AnnonceDto> getAnnonces(String startDate, String arrondissement, String quartier, String queryType) {
+  public List<AnnonceDto> getAnnonces(Date startDate, String arrondissement, String quartier, String queryType) {
     log.info("getAnnonces called");
     List<AnnonceDto> resultList = newArrayList();
     // Query database
-    if (!isEmpty(startDate)) {
+    if (startDate != null) {
       EntityManager em = emfInstance.createEntityManager();
       try {
         StringBuilder queryString = new StringBuilder();
@@ -59,14 +52,7 @@ public class AnnonceServiceImpl extends RemoteServiceServlet implements AnnonceS
         log.info("QueryString : " + queryString);
 
         Query query = em.createQuery(queryString.toString());
-        Calendar cal = Calendar.getInstance();
-        cal.set(YEAR, parseInt(startDate.substring(0, 4)));
-        cal.set(MONTH, parseInt(startDate.substring(5, 7)) - 1);
-        cal.set(DAY_OF_MONTH, parseInt(startDate.substring(8, 10)));
-        cal.set(HOUR_OF_DAY, 0);
-        cal.set(MINUTE, 0);
-        cal.set(MILLISECOND, 0);
-        query.setParameter("startDate", cal.getTime());
+        query.setParameter("startDate", startDate.getTime());
         query.setMaxResults(1000);
         log.info("Query : " + query);
         int index = 0;

@@ -51,7 +51,7 @@ public class FeedAnnonceServlet extends HttpServlet {
     }
     int nbAnnonceFeeded = startProcess(arrondissement, quartier, nbPieces);
     resp.setContentType("text/plain");
-    resp.getWriter().println(nbAnnonceFeeded + " annonces ont été enregistrées");
+    resp.getWriter().println(nbAnnonceFeeded + " annonces ont ï¿½tï¿½ enregistrï¿½es");
   }
 
   // idq correspond au quartier...
@@ -183,7 +183,7 @@ public class FeedAnnonceServlet extends HttpServlet {
     double superficie = 0;
     while (matcher.find()) {
       double tempSuperficie = parseDouble(matcher.group().replaceAll(",", "."));
-      if (tempSuperficie > 6) { // to avoid 2 in '2 pièces for example'
+      if (tempSuperficie > 6) { // to avoid 2 in '2 piï¿½ces for example'
         superficie = tempSuperficie;
       }
     }

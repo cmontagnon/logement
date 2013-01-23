@@ -2,6 +2,8 @@
 <module rename-to='perso_logement'>
   <!-- Inherit the core Web Toolkit stuff.                        -->
     <inherits name='com.google.gwt.user.User' />
+    <inherits name='com.extjs.gxt.ui.GXT' />
+    <inherits name='com.extjs.gxt.themes.Themes' />
 
     <inherits name="com.google.gwt.logging.Logging"/>
 

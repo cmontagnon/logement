@@ -3,6 +3,8 @@ package perso.logement.core;
 import java.io.Serializable;
 
 public class AnnonceKey implements Serializable {
+
+  private static final long serialVersionUID = 1L;
   private String reference;
   private double superficie;
   private long arrondissement;

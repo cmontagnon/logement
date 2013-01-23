@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.Transient;
 
+
 @Entity
 public class Annonce implements Serializable {
 

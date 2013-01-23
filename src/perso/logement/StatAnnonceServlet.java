@@ -183,7 +183,7 @@ public class StatAnnonceServlet extends HttpServlet {
             (int) (currentPriceBySquareMeterSum / (filteredPrixByAnnonce.size() - nbAnnoncesWithNullSuperficie));
 
         resp.getWriter().println(
-            "<div><span>Moyenne du prix au m² pour cette requête : " + meanPriceBySquareMeter + "</span></div>");
+            "<div><span>Moyenne du prix au mï¿½ pour cette requï¿½te : " + meanPriceBySquareMeter + "</span></div>");
         // We build the HTML table
         resp.getWriter().println("<table id=\"table-3\" class=\"sortable\">");
         resp.getWriter().println("<thead>");
@@ -192,8 +192,8 @@ public class StatAnnonceServlet extends HttpServlet {
         resp.getWriter().println("<th><b>Arrondissement</b></th>");
         resp.getWriter().println("<th><b>Quartier</b></th>");
         resp.getWriter().println("<th><b>Prix</b></th>");
-        resp.getWriter().println("<th><b>Prix/m²</b></th>");
-        resp.getWriter().println("<th><b>Différence à la moyenne (en %)</b></th>");
+        resp.getWriter().println("<th><b>Prix/mï¿½</b></th>");
+        resp.getWriter().println("<th><b>Diffï¿½rence ï¿½ la moyenne (en %)</b></th>");
         resp.getWriter().println("<th><b>Lien</b></th>");
         resp.getWriter().println("</thead>");
 
@@ -280,13 +280,13 @@ public class StatAnnonceServlet extends HttpServlet {
 
   private static void addStartDateFilter(HttpServletResponse resp, String startDateParameter) throws IOException {
     resp.getWriter().println(
-        "<div>Date de début :<input name=\"startDate\" value=\""
+        "<div>Date de dï¿½but :<input name=\"startDate\" value=\""
             + (startDateParameter == null ? "" : startDateParameter) + "\"/></div>");
   }
 
   private static void addQueryTypeFilter(HttpServletResponse resp, String queryTypeParameter) throws IOException {
     resp.getWriter().println(
-        "<div>Annonce évolution :<select id=\"queryType\" name=\"queryType\""
+        "<div>Annonce ï¿½volution :<select id=\"queryType\" name=\"queryType\""
             + (queryTypeParameter == null ? "" : " value=\"" + queryTypeParameter + "\"") + ">");
     resp.getWriter()
         .println(
