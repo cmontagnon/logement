@@ -5,3 +5,8 @@
 /war/WEB-INF/classes
 /war/WEB-INF/lib
 /war/WEB-INF/appengine-generated
+/war/perso_logement
+/gwt-unitCache
+/war/WEB-INF/deploy
+/war/WEB-INF/deploy/perso_logement
+/war/perso_logement/perso_logement.nocache.js

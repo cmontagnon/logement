@@ -13,7 +13,6 @@ import perso.logement.core.AnnonceKey;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ImageResourceCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.editor.client.Editor.Path;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -21,19 +20,14 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
-import com.sencha.gxt.data.shared.ModelKeyProvider;
-import com.sencha.gxt.data.shared.PropertyAccess;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
@@ -57,40 +51,15 @@ public class LogementWidget implements IsWidget {
   private TextField queryMeanPrice = new TextField();
   private Grid<AnnonceAggregate> annonceGrid;
   private ListStore<AnnonceAggregate> store;
+  private GridView<AnnonceAggregate> view;
 
   private static final String ANNONCES_WITH_PRICE_CHANGE_ONLY = "priceFallOnly";
   private static final String ALL_ANNONCES = "all";
   private static final String ALL_QUARTIERS = "all";
-  private AnnonceServiceAsync annonceService = GWT.create(AnnonceService.class);
+
+  private AnnonceQueryCommand annonceQueryCommand = new AnnonceQueryCommand(this);
 
   private static final AnnonceAggregateProperties properties = GWT.create(AnnonceAggregateProperties.class);
-
-  interface AnnonceAggregateProperties extends PropertyAccess<AnnonceAggregate> {
-    @Path("key")
-    ModelKeyProvider<AnnonceAggregate> key();
-
-    ValueProvider<AnnonceAggregate, String> reference();
-
-    ValueProvider<AnnonceAggregate, Double> superficie();
-
-    ValueProvider<AnnonceAggregate, Short> arrondissement();
-
-    ValueProvider<AnnonceAggregate, String> quartier();
-
-    @Path("pricesAsString")
-    ValueProvider<AnnonceAggregate, String> prices();
-
-    ValueProvider<AnnonceAggregate, ImageResource> evolutionImage();
-
-    @Path("pricesBySquareMeterAsString")
-    ValueProvider<AnnonceAggregate, String> pricesBySquareMeter();
-
-    ValueProvider<AnnonceAggregate, Double> meanPriceDifference();
-
-    ValueProvider<AnnonceAggregate, ImageResource> meanPriceDifferenceImage();
-
-    ValueProvider<AnnonceAggregate, String> seLogerLink();
-  }
 
   @Override
   public Widget asWidget() {
@@ -228,92 +197,83 @@ public class LogementWidget implements IsWidget {
   }
 
   public GridView<AnnonceAggregate> buildView() {
-    GridView<AnnonceAggregate> view = new GridView<AnnonceAggregate>();
+    view = new GridView<AnnonceAggregate>();
     view.setForceFit(true);
     return view;
   }
 
   private Button createSubmitButton() {
-    // TODO : refactor
     Button submitButton = new Button("Submit");
     submitButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        AsyncCallback<List<AnnonceDto>> callback = new AsyncCallback<List<AnnonceDto>>() {
+        String quartier = ALL_QUARTIERS;
+        if (quartierListBox.getSelectedIndex() != -1) {
+          quartier = quartierListBox.getValue(quartierListBox.getSelectedIndex());
+        }
 
-          @Override
-          public void onSuccess(List<AnnonceDto> result) {
-            store.clear();
-            log.info("onSuccess called with a result size : " + result.size());
-            Map<AnnonceKey, AnnonceAggregate> annonceAggregateByAnnonceKey =
-                new HashMap<AnnonceKey, AnnonceAggregate>();
-            for (AnnonceDto annonce : result) {
-              AnnonceKey annonceKey =
-                  new AnnonceKey(annonce.getReference(), annonce.getSuperficie(), annonce.getArrondissement(), annonce
-                      .getQuartier());
-              AnnonceAggregate annonceAggregate = null;
-              if (annonceAggregateByAnnonceKey.containsKey(annonceKey)) {
-                annonceAggregate = annonceAggregateByAnnonceKey.get(annonceKey);
-              } else {
-                annonceAggregate = new AnnonceAggregate();
-                annonceAggregateByAnnonceKey.put(annonceKey, annonceAggregate);
-              }
-              annonceAggregate.addAnnonce(annonce);
-            }
-
-            // 1. We filter annonces with no price change if need be
-            String queryTypeParameter = queryTypeListBox.getValue(queryTypeListBox.getSelectedIndex());
-            List<AnnonceAggregate> annoncesToDisplay = new ArrayList<AnnonceAggregate>();
-            if (queryTypeParameter == null || "".equals(queryTypeParameter)
-                || ANNONCES_WITH_PRICE_CHANGE_ONLY.equals(queryTypeParameter)) {
-              for (AnnonceAggregate annonceAggregateDto : annonceAggregateByAnnonceKey.values()) {
-                if (annonceAggregateDto.hasMultiplePrices()) {
-                  annoncesToDisplay.add(annonceAggregateDto);
-                }
-              }
-            } else {
-              annoncesToDisplay = new ArrayList<AnnonceAggregate>(annonceAggregateByAnnonceKey.values());
-            }
-
-            // 2. We compute the mean price by square meter value
-            double currentPriceBySquareMeterSum = 0;
-            int nbAnnoncesWithNullSuperficie = 0;
-            for (AnnonceAggregate annonceAggregate : annoncesToDisplay) {
-              List<Double> prices = annonceAggregate.getPrices();
-              if (annonceAggregate.getSuperficie() != 0) {
-                currentPriceBySquareMeterSum += (prices.get(prices.size() - 1)) / annonceAggregate.getSuperficie();
-              } else {
-                nbAnnoncesWithNullSuperficie++;
-              }
-            }
-            int meanPriceBySquareMeter =
-                (int) (currentPriceBySquareMeterSum / (annoncesToDisplay.size() - nbAnnoncesWithNullSuperficie));
-
-            for (AnnonceAggregate annonceToDisplay : annoncesToDisplay) {
-              annonceToDisplay.setQueryMeanPriceBySquareMeter(meanPriceBySquareMeter);
-              store.add(annonceToDisplay);
-            }
-
-            queryMeanPrice.setValue(String.valueOf(meanPriceBySquareMeter));
-
-            log.info("Nb annonces that should be displayed in the table : " + annoncesToDisplay.size());
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            DialogBox dialogBox = new DialogBox();
-            dialogBox.setText("Failure : " + caught.getMessage());
-            dialogBox.show();
-          }
-        };
-        log.info("call annonce service to get Annonces");
-        String quartier = quartierListBox.getValue(quartierListBox.getSelectedIndex());
-        annonceService.getAnnonces(datePicker.getValue(), arrondissementListBox.getValue(arrondissementListBox
+        annonceQueryCommand.getAnnonces(datePicker.getValue(), arrondissementListBox.getValue(arrondissementListBox
             .getSelectedIndex()), ALL_QUARTIERS.equals(quartier) ? "" : quartier, queryTypeListBox
-            .getValue(queryTypeListBox.getSelectedIndex()), callback);
+            .getValue(queryTypeListBox.getSelectedIndex()));
       }
     });
     return submitButton;
+  }
+
+  public void updateResult(List<AnnonceDto> annonces) {
+    removePendingStatus();
+    store.clear();
+    Map<AnnonceKey, AnnonceAggregate> annonceAggregateByAnnonceKey = new HashMap<AnnonceKey, AnnonceAggregate>();
+    for (AnnonceDto annonce : annonces) {
+      AnnonceKey annonceKey =
+          new AnnonceKey(annonce.getReference(), annonce.getSuperficie(), annonce.getArrondissement(),
+              annonce.getQuartier());
+      AnnonceAggregate annonceAggregate = null;
+      if (annonceAggregateByAnnonceKey.containsKey(annonceKey)) {
+        annonceAggregate = annonceAggregateByAnnonceKey.get(annonceKey);
+      } else {
+        annonceAggregate = new AnnonceAggregate();
+        annonceAggregateByAnnonceKey.put(annonceKey, annonceAggregate);
+      }
+      annonceAggregate.addAnnonce(annonce);
+    }
+
+    // 1. We filter annonces with no price change if need be
+    String queryTypeParameter = queryTypeListBox.getValue(queryTypeListBox.getSelectedIndex());
+    List<AnnonceAggregate> annoncesToDisplay = new ArrayList<AnnonceAggregate>();
+    if (queryTypeParameter == null || "".equals(queryTypeParameter)
+        || ANNONCES_WITH_PRICE_CHANGE_ONLY.equals(queryTypeParameter)) {
+      for (AnnonceAggregate annonceAggregateDto : annonceAggregateByAnnonceKey.values()) {
+        if (annonceAggregateDto.hasMultiplePrices()) {
+          annoncesToDisplay.add(annonceAggregateDto);
+        }
+      }
+    } else {
+      annoncesToDisplay = new ArrayList<AnnonceAggregate>(annonceAggregateByAnnonceKey.values());
+    }
+
+    // 2. We compute the mean price by square meter value
+    double currentPriceBySquareMeterSum = 0;
+    int nbAnnoncesWithNullSuperficie = 0;
+    for (AnnonceAggregate annonceAggregate : annoncesToDisplay) {
+      List<Double> prices = annonceAggregate.getPrices();
+      if (annonceAggregate.getSuperficie() != 0) {
+        currentPriceBySquareMeterSum += (prices.get(prices.size() - 1)) / annonceAggregate.getSuperficie();
+      } else {
+        nbAnnoncesWithNullSuperficie++;
+      }
+    }
+    int meanPriceBySquareMeter =
+        (int) (currentPriceBySquareMeterSum / (annoncesToDisplay.size() - nbAnnoncesWithNullSuperficie));
+
+    for (AnnonceAggregate annonceToDisplay : annoncesToDisplay) {
+      annonceToDisplay.setQueryMeanPriceBySquareMeter(meanPriceBySquareMeter);
+      store.add(annonceToDisplay);
+    }
+
+    queryMeanPrice.setValue(String.valueOf(meanPriceBySquareMeter));
+    view.refresh(true);
+    log.info("Nb annonces that should be displayed in the table : " + annoncesToDisplay.size());
   }
 
   private void initQueryTypeListBox() {
@@ -344,5 +304,13 @@ public class LogementWidget implements IsWidget {
       }
     });
     return arrondissementListBox;
+  }
+
+  public void displayPendingStatus() {
+    annonceGrid.mask("Getting annonces");
+  }
+
+  private void removePendingStatus() {
+    annonceGrid.unmask();
   }
 }
