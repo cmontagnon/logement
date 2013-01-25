@@ -13,15 +13,19 @@ import java.util.List;
 import java.util.Set;
 
 import perso.logement.client.dto.AnnonceDto;
+import perso.logement.client.resources.LogementResources;
 import perso.logement.core.AnnonceEvolution;
 
-import com.extjs.gxt.ui.client.data.BaseModel;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.resources.client.ImageResource;
 
-public class AnnonceAggregate extends BaseModel implements Serializable {
+public class AnnonceAggregate implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private List<AnnonceDto> annonces = new ArrayList<AnnonceDto>();
   private int queryMeanPriceBySquareMeter;
+
+  private static LogementResources resources = GWT.create(LogementResources.class);
 
   public void addAnnonce(AnnonceDto annonce) {
     annonces.add(annonce);
@@ -131,6 +135,28 @@ public class AnnonceAggregate extends BaseModel implements Serializable {
       }
     }
     return meanTagPercentage;
+  }
+
+  public ImageResource getMeanPriceDifferenceImage() {
+    return getMeanPriceDifference() >= 0 ? resources.green() : resources.red();
+  }
+
+  public String getSeLogerLink() {
+    return "<a href=\"http://www.seloger.com/recherche.htm?ci=7501" + getArrondissement()
+        + "&idtt=2&org=advanced_search&refannonce=" + getReference() + "\">seloger</a>";
+  }
+
+  public ImageResource getEvolutionImage() {
+    AnnonceEvolution annonceEvolution = getAnnonceEvolution();
+    switch (annonceEvolution) {
+      case DOWN:
+        return resources.down();
+      case UP:
+        return resources.up();
+      default:
+        break;
+    }
+    return null;
   }
 
   private static double round(double x, int scale, int roundingMethod) {

@@ -12,7 +12,6 @@ import perso.logement.core.AnnonceKey;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ImageResourceCell;
-import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.Editor.Path;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -29,7 +28,6 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.ValueProvider;
@@ -48,9 +46,9 @@ import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GridView;
 
-public class LogementEntryPoint implements IsWidget, EntryPoint {
+public class LogementWidget implements IsWidget {
 
-  private static final Logger log = Logger.getLogger(LogementEntryPoint.class.getName());
+  private static final Logger log = Logger.getLogger(LogementWidget.class.getName());
 
   private ListBox arrondissementListBox = new ListBox();
   private ListBox quartierListBox = new ListBox();
@@ -64,6 +62,35 @@ public class LogementEntryPoint implements IsWidget, EntryPoint {
   private static final String ALL_ANNONCES = "all";
   private static final String ALL_QUARTIERS = "all";
   private AnnonceServiceAsync annonceService = GWT.create(AnnonceService.class);
+
+  private static final AnnonceAggregateProperties properties = GWT.create(AnnonceAggregateProperties.class);
+
+  interface AnnonceAggregateProperties extends PropertyAccess<AnnonceAggregate> {
+    @Path("key")
+    ModelKeyProvider<AnnonceAggregate> key();
+
+    ValueProvider<AnnonceAggregate, String> reference();
+
+    ValueProvider<AnnonceAggregate, Double> superficie();
+
+    ValueProvider<AnnonceAggregate, Short> arrondissement();
+
+    ValueProvider<AnnonceAggregate, String> quartier();
+
+    @Path("pricesAsString")
+    ValueProvider<AnnonceAggregate, String> prices();
+
+    ValueProvider<AnnonceAggregate, ImageResource> evolutionImage();
+
+    @Path("pricesBySquareMeterAsString")
+    ValueProvider<AnnonceAggregate, String> pricesBySquareMeter();
+
+    ValueProvider<AnnonceAggregate, Double> meanPriceDifference();
+
+    ValueProvider<AnnonceAggregate, ImageResource> meanPriceDifferenceImage();
+
+    ValueProvider<AnnonceAggregate, String> seLogerLink();
+  }
 
   @Override
   public Widget asWidget() {
@@ -97,11 +124,6 @@ public class LogementEntryPoint implements IsWidget, EntryPoint {
         panel.removeFromParent();
       }
     }));
-  }
-
-  @Override
-  public void onModuleLoad() {
-    RootPanel.get().add(this);
   }
 
   private Widget createQueryForm() {
@@ -142,35 +164,6 @@ public class LogementEntryPoint implements IsWidget, EntryPoint {
 
     return vp;
   }
-
-  interface AnnonceAggregateProperties extends PropertyAccess<AnnonceAggregate> {
-    @Path("key")
-    ModelKeyProvider<AnnonceAggregate> key();
-
-    ValueProvider<AnnonceAggregate, String> reference();
-
-    ValueProvider<AnnonceAggregate, Double> superficie();
-
-    ValueProvider<AnnonceAggregate, Short> arrondissement();
-
-    ValueProvider<AnnonceAggregate, String> quartier();
-
-    @Path("pricesAsString")
-    ValueProvider<AnnonceAggregate, String> prices();
-
-    ValueProvider<AnnonceAggregate, ImageResource> evolutionImage();
-
-    @Path("pricesBySquareMeterAsString")
-    ValueProvider<AnnonceAggregate, String> pricesBySquareMeter();
-
-    ValueProvider<AnnonceAggregate, Double> meanPriceDifference();
-
-    ValueProvider<AnnonceAggregate, ImageResource> meanPriceDifferenceImage();
-
-    ValueProvider<AnnonceAggregate, String> seLogerLink();
-  }
-
-  private static final AnnonceAggregateProperties properties = GWT.create(AnnonceAggregateProperties.class);
 
   private Widget initAnnonceTable() {
     final ColumnModel<AnnonceAggregate> columnModel = new ColumnModel<AnnonceAggregate>(buildColumnConfig());
