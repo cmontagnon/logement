@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
@@ -39,6 +40,7 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.GridView;
+import com.sencha.gxt.widget.core.client.grid.RowExpander;
 
 public class LogementWidget implements IsWidget {
 
@@ -52,6 +54,7 @@ public class LogementWidget implements IsWidget {
   private Grid<AnnonceAggregate> annonceGrid;
   private ListStore<AnnonceAggregate> store;
   private GridView<AnnonceAggregate> view;
+  private RowExpander<AnnonceAggregate> expander;
 
   private static final String ANNONCES_WITH_PRICE_CHANGE_ONLY = "priceFallOnly";
   private static final String ALL_ANNONCES = "all";
@@ -142,6 +145,7 @@ public class LogementWidget implements IsWidget {
     annonceGrid.setHeight(500); // TODO : comment faire autrement?
     annonceGrid.setView(buildView());
     annonceGrid.setBorders(true);
+    expander.initPlugin(annonceGrid);
     return annonceGrid;
   }
 
@@ -150,7 +154,7 @@ public class LogementWidget implements IsWidget {
    * 
    * @return List<ColumnConfig> list of column configuration
    */
-  public List<ColumnConfig<AnnonceAggregate, ?>> buildColumnConfig() {
+  private List<ColumnConfig<AnnonceAggregate, ?>> buildColumnConfig() {
     List<ColumnConfig<AnnonceAggregate, ?>> columnsConfig = new ArrayList<ColumnConfig<AnnonceAggregate, ?>>();
     ColumnConfig<AnnonceAggregate, String> cc1 =
         new ColumnConfig<AnnonceAggregate, String>(properties.reference(), 100, "Reference");
@@ -160,13 +164,13 @@ public class LogementWidget implements IsWidget {
         new ColumnConfig<AnnonceAggregate, Short>(properties.arrondissement(), 100, "Arrondissement");
     ColumnConfig<AnnonceAggregate, String> cc4 =
         new ColumnConfig<AnnonceAggregate, String>(properties.quartier(), 100, "Quartier");
-    ColumnConfig<AnnonceAggregate, String> cc5 =
-        new ColumnConfig<AnnonceAggregate, String>(properties.prices(), 100, "Prix");
+    ColumnConfig<AnnonceAggregate, Double> cc5 =
+        new ColumnConfig<AnnonceAggregate, Double>(properties.lastPrice(), 100, "Prix");
     ColumnConfig<AnnonceAggregate, ImageResource> cc6 =
         new ColumnConfig<AnnonceAggregate, ImageResource>(properties.evolutionImage(), 100, "Evolution");
     cc6.setCell(new ImageResourceCell());
-    ColumnConfig<AnnonceAggregate, String> cc7 =
-        new ColumnConfig<AnnonceAggregate, String>(properties.pricesBySquareMeter(), 100, "Prix/m²");
+    ColumnConfig<AnnonceAggregate, Long> cc7 =
+        new ColumnConfig<AnnonceAggregate, Long>(properties.lastPriceBySquareMeter(), 100, "Prix/m²");
     ColumnConfig<AnnonceAggregate, Double> cc8 =
         new ColumnConfig<AnnonceAggregate, Double>(properties.meanPriceDifference(), 100, "Différence à la moyenne");
     ColumnConfig<AnnonceAggregate, ImageResource> cc9 =
@@ -183,6 +187,27 @@ public class LogementWidget implements IsWidget {
       }
     });
 
+    IdentityValueProvider<AnnonceAggregate> identity = new IdentityValueProvider<AnnonceAggregate>();
+
+    expander = new RowExpander<AnnonceAggregate>(identity, new AbstractCell<AnnonceAggregate>() {
+      @Override
+      public void render(Context context, AnnonceAggregate value, SafeHtmlBuilder sb) {
+        sb.appendHtmlConstant("<table style='border:1px solid black;border-collapse:collapse;'>");
+        sb.appendHtmlConstant("<tr>");
+        sb.appendHtmlConstant("<td style='border:1px solid black;'><b>Date</b></td>");
+        sb.appendHtmlConstant("<td style='border:1px solid black;'><b>Prix</b></td>");
+        sb.appendHtmlConstant("</tr>");
+        for (AnnonceDto annonce : value.getAnnonces()) {
+          sb.appendHtmlConstant("<tr>");
+          sb.appendHtmlConstant("<td style='border:1px solid black;'>" + annonce.getFormattedDate() + "</td>");
+          sb.appendHtmlConstant("<td style='border:1px solid black;'>" + annonce.getPrix() + "</td>");
+          sb.appendHtmlConstant("</tr>");
+        }
+        sb.appendHtmlConstant("</table>");
+      }
+    });
+
+    columnsConfig.add(expander);
     columnsConfig.add(cc1);
     columnsConfig.add(cc2);
     columnsConfig.add(cc3);

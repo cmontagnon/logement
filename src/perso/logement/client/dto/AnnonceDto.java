@@ -3,6 +3,8 @@ package perso.logement.client.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
+
 public class AnnonceDto implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -49,6 +51,11 @@ public class AnnonceDto implements Serializable {
 
   public Date getDate() {
     return date;
+  }
+
+  public String getFormattedDate() {
+    DateTimeFormat dateFormatter = DateTimeFormat.getFormat("yyyy-MM-dd");
+    return dateFormatter.format(date);
   }
 
   public short getArrondissement() {

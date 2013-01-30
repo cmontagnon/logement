@@ -51,6 +51,10 @@ public class AnnonceAggregate implements Serializable {
     return annonces.get(0).getQuartier();
   }
 
+  public Double getLastPrice() {
+    return annonces.get(annonces.size() - 1).getPrix();
+  }
+
   public List<Double> getPrices() {
     List<Double> prices = new ArrayList<Double>();
     for (AnnonceDto annonce : annonces) {
@@ -59,26 +63,9 @@ public class AnnonceAggregate implements Serializable {
     return prices;
   }
 
-  public String getPricesAsString() {
-    StringBuilder prices = new StringBuilder();
-    for (AnnonceDto annonce : annonces) {
-      prices.append(annonce.getPrix());
-      prices.append(";");
-    }
-    return prices.toString();
-  }
-
-  public String getPricesBySquareMeterAsString() {
-    StringBuilder pricesBySquareMeter = new StringBuilder();
-    for (AnnonceDto annonce : annonces) {
-      if (annonce.getSuperficie() != 0) {
-        pricesBySquareMeter.append(Math.round(annonce.getPrix() / annonce.getSuperficie()));
-        pricesBySquareMeter.append(";");
-      } else {
-        pricesBySquareMeter.append("NA;");
-      }
-    }
-    return pricesBySquareMeter.toString();
+  public Long getLastPriceBySquareMeter() {
+    AnnonceDto lastAnnonce = annonces.get(annonces.size() - 1);
+    return Math.round(lastAnnonce.getPrix() / lastAnnonce.getSuperficie());
   }
 
   public List<Long> getPricesBySquareMeter() {

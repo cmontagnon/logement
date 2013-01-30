@@ -18,13 +18,11 @@ public interface AnnonceAggregateProperties extends PropertyAccess<AnnonceAggreg
 
   ValueProvider<AnnonceAggregate, String> quartier();
 
-  @Path("pricesAsString")
-  ValueProvider<AnnonceAggregate, String> prices();
+  ValueProvider<AnnonceAggregate, Double> lastPrice();
 
   ValueProvider<AnnonceAggregate, ImageResource> evolutionImage();
 
-  @Path("pricesBySquareMeterAsString")
-  ValueProvider<AnnonceAggregate, String> pricesBySquareMeter();
+  ValueProvider<AnnonceAggregate, Long> lastPriceBySquareMeter();
 
   ValueProvider<AnnonceAggregate, Double> meanPriceDifference();
 

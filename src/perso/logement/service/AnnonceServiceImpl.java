@@ -52,7 +52,7 @@ public class AnnonceServiceImpl extends RemoteServiceServlet implements AnnonceS
         log.info("QueryString : " + queryString);
 
         Query query = em.createQuery(queryString.toString());
-        query.setParameter("startDate", startDate.getTime());
+        query.setParameter("startDate", startDate);
         query.setMaxResults(1000);
         log.info("Query : " + query);
         int index = 0;

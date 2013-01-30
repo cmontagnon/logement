@@ -1,6 +1,6 @@
 package perso.logement.core;
 
-import static javax.persistence.TemporalType.TIMESTAMP;
+import static javax.persistence.TemporalType.DATE;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -11,7 +11,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.Transient;
-
 
 @Entity
 public class Annonce implements Serializable {
@@ -25,7 +24,7 @@ public class Annonce implements Serializable {
   private String text;
   private double prix;
   private double superficie;
-  @Temporal(TIMESTAMP)
+  @Temporal(DATE)
   private Date date;
   private short arrondissement;
   private String quartier;
