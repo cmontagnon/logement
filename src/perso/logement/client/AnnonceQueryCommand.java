@@ -24,7 +24,8 @@ public class AnnonceQueryCommand {
     this.widget = widget;
   }
 
-  public void getAnnonces(Date startDate, String arrondissement, String quartier, String queryType) {
+  public void getAnnonces(Date startDate, String arrondissement, String quartier, Double surfaceMin, Double surfaceMax,
+      Double priceMin, Double priceMax, String queryType) {
     AsyncCallback<List<AnnonceDto>> callback = new AsyncCallback<List<AnnonceDto>>() {
 
       @Override
@@ -43,7 +44,8 @@ public class AnnonceQueryCommand {
       }
     };
     log.info("call annonce service to get Annonces");
-    annonceService.getAnnonces(startDate, arrondissement, quartier, queryType, callback);
+    annonceService.getAnnonces(startDate, arrondissement, quartier, surfaceMin, surfaceMax, priceMin, priceMax,
+        queryType, callback);
     widget.displayPendingStatus();
   }
 }

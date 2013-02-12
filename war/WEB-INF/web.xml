@@ -26,6 +26,16 @@
         <servlet-class>perso.logement.service.AnnonceServiceImpl</servlet-class>
     </servlet>
     
+    <servlet>
+        <servlet-name>StatisticServlet</servlet-name>
+        <servlet-class>perso.logement.service.AnnonceServiceImpl</servlet-class>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>UpdateStatisticServlet</servlet-name>
+        <servlet-class>perso.logement.UpdateStatisticServlet</servlet-class>
+    </servlet>
+    
     <servlet-mapping>
         <servlet-name>FeedAnnonce</servlet-name>
         <url-pattern>/feedAnnonce</url-pattern>
@@ -49,6 +59,14 @@
     <servlet-mapping>
         <servlet-name>AnnonceServlet</servlet-name>
         <url-pattern>/perso_logement/getAnnonces</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>StatisticServlet</servlet-name>
+        <url-pattern>/perso_stat/getAnnonces</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UpdateStatisticServlet</servlet-name>
+        <url-pattern>/updateStats</url-pattern>
     </servlet-mapping>
     
     <welcome-file-list>

@@ -22,7 +22,7 @@ public class FeedAnnonceTests {
         urlString = urlString.replaceAll("\\{text\\}", "text" + (i % 5));
         urlString = urlString.replaceAll("\\{prix\\}", "" + (100000 + 30000 * Math.random()));
         urlString = urlString.replaceAll("\\{superficie\\}", "" + (50 + (i / 10) * 5));
-        urlString = urlString.replaceAll("\\{date\\}", "2013-01-15");
+        urlString = urlString.replaceAll("\\{date\\}", "2013-02-18");
         urlString = urlString.replaceAll("\\{arrondissement\\}", "10");
         urlString = urlString.replaceAll("\\{quartier\\}", "Louis&nbsp;Blanc/Aqueduc");
         URL url = new URL(urlString);

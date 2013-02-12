@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='perso_stat'>
+  <!-- Inherit the core Web Toolkit stuff.                        -->
+    <inherits name='com.google.gwt.user.User' />
+    <inherits name='com.sencha.gxt.ui.GXT' />
+    <inherits name='com.sencha.gxt.theme.base.Base' />
+    <inherits name='com.sencha.gxt.chart.Chart' />
+
+    <inherits name="com.google.gwt.logging.Logging"/>
+
+    <inherits name='com.google.gwt.user.theme.standard.Standard' />
+
+    <source path="client" />
+
+    <source path="core" />
+
+  <!-- Specify the app entry point class.                         -->
+    <entry-point class='perso.logement.client.StatisticEntryPoint' />
+</module> 

@@ -29,4 +29,10 @@ public interface AnnonceAggregateProperties extends PropertyAccess<AnnonceAggreg
   ValueProvider<AnnonceAggregate, ImageResource> meanPriceDifferenceImage();
 
   ValueProvider<AnnonceAggregate, String> seLogerLink();
+
+  /**
+   * Round the last price by square meter
+   * @return
+   */
+  ValueProvider<AnnonceAggregate, Long> lastPriceBySquareMeterRound();
 }

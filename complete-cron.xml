@@ -1,0 +1,629 @@
+Mercredi : 14
+Jeudi : 15 (ok)
+Vendredi : 16 (ok)
+Samedi : 17
+Dimanche : 10 (ok)
+Lundi : 11 (ok)
+Mardi : 19 et 20 (ok)
+Mercredi : 12
+
+<!----------------------->
+<!-- Arrondissement 10 -->
+<!----------------------->
+<cron>
+<url>/feedAnnonce?quartier=133091&#x26;arrondissement=10</url>
+<schedule>every monday 06:00</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133092&#x26;arrondissement=10</url>
+<schedule>every monday 06:01</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133093&#x26;arrondissement=10</url>
+<schedule>every monday 06:02</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133094&#x26;arrondissement=10</url>
+<schedule>every monday 06:03</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133095&#x26;arrondissement=10</url>
+<schedule>every monday 06:04</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133096&#x26;arrondissement=10</url>
+<schedule>every monday 06:05</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+
+<!----------------------->
+<!-- Arrondissement 11 -->
+<!----------------------->
+<cron>
+<url>/feedAnnonce?quartier=133097&#x26;arrondissement=11</url>
+<schedule>every thursday 06:00</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133098&#x26;arrondissement=11&#x26;nbPieces=1</url>
+<schedule>every thursday 06:01</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133098&#x26;arrondissement=11&#x26;nbPieces=2</url>
+<schedule>every thursday 06:02</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133098&#x26;arrondissement=11&#x26;nbPieces=3</url>
+<schedule>every thursday 06:03</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133098&#x26;arrondissement=11&#x26;nbPieces=4</url>
+<schedule>every thursday 06:04</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133098&#x26;arrondissement=11&#x26;nbPieces=5</url>
+<schedule>every thursday 06:05</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133099&#x26;arrondissement=11&#x26;nbPieces=1</url>
+<schedule>every thursday 06:06</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133099&#x26;arrondissement=11&#x26;nbPieces=2</url>
+<schedule>every thursday 06:07</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133099&#x26;arrondissement=11&#x26;nbPieces=3</url>
+<schedule>every thursday 06:08</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133099&#x26;arrondissement=11&#x26;nbPieces=4</url>
+<schedule>every thursday 06:09</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133099&#x26;arrondissement=11&#x26;nbPieces=5</url>
+<schedule>every thursday 06:10</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133100&#x26;arrondissement=11&#x26;nbPieces=1</url>
+<schedule>every wednesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133100&#x26;arrondissement=11&#x26;nbPieces=2</url>
+<schedule>every wednesday 06:12</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133100&#x26;arrondissement=11&#x26;nbPieces=3</url>
+<schedule>every wednesday 06:13</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133100&#x26;arrondissement=11&#x26;nbPieces=4</url>
+<schedule>every wednesday 06:14</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133100&#x26;arrondissement=11&#x26;nbPieces=5</url>
+<schedule>every wednesday 06:15</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133101&#x26;arrondissement=11</url>
+<schedule>every wednesday 06:16</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+
+<!----------------------->
+<!-- Arrondissement 12 -->
+<!----------------------->
+<cron>
+<url>/feedAnnonce?quartier=133102&#x26;arrondissement=12</url>
+<schedule>every wednesday 06:00</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133103&#x26;arrondissement=12</url>
+<schedule>every wednesday 06:01</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133104&#x26;arrondissement=12</url>
+<schedule>every wednesday 06:02</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133105&#x26;arrondissement=12</url>
+<schedule>every wednesday 06:03</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133106&#x26;arrondissement=12</url>
+<schedule>every wednesday 06:04</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133107&#x26;arrondissement=12</url>
+<schedule>every wednesday 06:05</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133108&#x26;arrondissement=12</url>
+<schedule>every wednesday 06:06</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133759&#x26;arrondissement=12</url>
+<schedule>every wednesday 06:07</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133764&#x26;arrondissement=12</url>
+<schedule>every wednesday 06:08</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+
+<!----------------------->
+<!-- Arrondissement 13 -->
+<!----------------------->
+<cron>
+<url>/feedAnnonce?quartier=133109&#x26;arrondissement=13</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133110&#x26;arrondissement=13</url>
+<schedule>every thursday 06:18</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133111&#x26;arrondissement=13</url>
+<schedule>every thursday 06:19</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133112&#x26;arrondissement=13</url>
+<schedule>every thursday 06:20</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133113&#x26;arrondissement=13</url>
+<schedule>every thursday 06:21</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133114&#x26;arrondissement=13</url>
+<schedule>every thursday 06:22</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133115&#x26;arrondissement=13</url>
+<schedule>every thursday 06:23</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133116&#x26;arrondissement=13</url>
+<schedule>every thursday 06:24</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+
+<!----------------------->
+<!-- Arrondissement 14 -->
+<!----------------------->
+<cron>
+<url>/feedAnnonce?quartier=133117&#x26;arrondissement=14</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133118&#x26;arrondissement=14</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133119&#x26;arrondissement=14&#x26;nbPieces=1</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133119&#x26;arrondissement=14&#x26;nbPieces=2</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133119&#x26;arrondissement=14&#x26;nbPieces=3</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133119&#x26;arrondissement=14&#x26;nbPieces=4</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133119&#x26;arrondissement=14&#x26;nbPieces=5</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133120&#x26;arrondissement=14</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133121&#x26;arrondissement=14</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133122&#x26;arrondissement=14</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+
+<!----------------------->
+<!-- Arrondissement 15 -->
+<!----------------------->
+<cron>
+<url>/feedAnnonce?quartier=133123&#x26;arrondissement=15</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133124&#x26;arrondissement=15&#x26;nbPieces=1</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133124&#x26;arrondissement=15&#x26;nbPieces=2</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133124&#x26;arrondissement=15&#x26;nbPieces=3</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133124&#x26;arrondissement=15&#x26;nbPieces=4</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133124&#x26;arrondissement=15&#x26;nbPieces=5</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133125&#x26;arrondissement=15</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133126&#x26;arrondissement=15</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133127&#x26;arrondissement=15</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133128&#x26;arrondissement=15&#x26;nbPieces=1</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133128&#x26;arrondissement=15&#x26;nbPieces=2</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133128&#x26;arrondissement=15&#x26;nbPieces=3</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133128&#x26;arrondissement=15&#x26;nbPieces=4</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133128&#x26;arrondissement=15&#x26;nbPieces=5</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133129&#x26;arrondissement=15</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+
+<!----------------------->
+<!-- Arrondissement 16 -->
+<!----------------------->
+<cron>
+<url>/feedAnnonce?quartier=133051&#x26;arrondissement=16</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133133&#x26;arrondissement=16&#x26;nbPieces=1</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133133&#x26;arrondissement=16&#x26;nbPieces=2</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133133&#x26;arrondissement=16&#x26;nbPieces=3</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133133&#x26;arrondissement=16&#x26;nbPieces=4</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133133&#x26;arrondissement=16&#x26;nbPieces=5</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133134&#x26;arrondissement=16</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133135&#x26;arrondissement=16</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133136&#x26;arrondissement=16</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133137&#x26;arrondissement=16&#x26;nbPieces=1</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133137&#x26;arrondissement=16&#x26;nbPieces=2</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133137&#x26;arrondissement=16&#x26;nbPieces=3</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133137&#x26;arrondissement=16&#x26;nbPieces=4</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133137&#x26;arrondissement=16&#x26;nbPieces=5</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133769&#x26;arrondissement=16&#x26;nbPieces=1</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133769&#x26;arrondissement=16&#x26;nbPieces=2</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133769&#x26;arrondissement=16&#x26;nbPieces=3</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133769&#x26;arrondissement=16&#x26;nbPieces=4</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133769&#x26;arrondissement=16&#x26;nbPieces=5</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133770&#x26;arrondissement=16&#x26;nbPieces=1</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133770&#x26;arrondissement=16&#x26;nbPieces=2</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133770&#x26;arrondissement=16&#x26;nbPieces=3</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133770&#x26;arrondissement=16&#x26;nbPieces=4</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133770&#x26;arrondissement=16&#x26;nbPieces=5</url>
+<schedule>every thursday 06:17</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+
+<!----------------------->
+<!-- Arrondissement 18 -->
+<!----------------------->
+<cron>
+<url>/feedAnnonce?quartier=133146&#x26;arrondissement=18</url>
+<schedule>every tuesday 06:00</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133147&#x26;arrondissement=18</url>
+<schedule>every tuesday 06:01</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133148&#x26;arrondissement=18</url>
+<schedule>every tuesday 06:02</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133150&#x26;arrondissement=18</url>
+<schedule>every tuesday 06:03</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133151&#x26;arrondissement=18</url>
+<schedule>every tuesday 06:04</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133152&#x26;arrondissement=18</url>
+<schedule>every tuesday 06:05</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133153&#x26;arrondissement=18</url>
+<schedule>every tuesday 06:06</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133149&#x26;arrondissement=18&#x26;nbPieces=1</url>
+<schedule>every tuesday 06:07</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133149&#x26;arrondissement=18&#x26;nbPieces=2</url>
+<schedule>every tuesday 06:08</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133149&#x26;arrondissement=18&#x26;nbPieces=3</url>
+<schedule>every tuesday 06:09</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133149&#x26;arrondissement=18&#x26;nbPieces=4</url>
+<schedule>every tuesday 06:10</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133149&#x26;arrondissement=18&#x26;nbPieces=5</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+
+<!----------------------->
+<!-- Arrondissement 19 -->
+<!----------------------->
+<cron>
+<url>/feedAnnonce?quartier=133154&#x26;arrondissement=19</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133155&#x26;arrondissement=19&#x26;nbPieces=1</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133155&#x26;arrondissement=19&#x26;nbPieces=2</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133155&#x26;arrondissement=19&#x26;nbPieces=3</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133155&#x26;arrondissement=19&#x26;nbPieces=4</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133155&#x26;arrondissement=19&#x26;nbPieces=5</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133156&#x26;arrondissement=19</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133157&#x26;arrondissement=19</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133158&#x26;arrondissement=19</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133159&#x26;arrondissement=19</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133160&#x26;arrondissement=19</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133161&#x26;arrondissement=19&#x26;nbPieces=1</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133161&#x26;arrondissement=19&#x26;nbPieces=2</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133161&#x26;arrondissement=19&#x26;nbPieces=3</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133161&#x26;arrondissement=19&#x26;nbPieces=4</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>
+<cron>
+<url>/feedAnnonce?quartier=133161&#x26;arrondissement=19&#x26;nbPieces=5</url>
+<schedule>every tuesday 06:11</schedule>
+<timezone>Europe/Paris</timezone>
+</cron>

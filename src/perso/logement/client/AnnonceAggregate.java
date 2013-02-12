@@ -21,6 +21,7 @@ import com.google.gwt.resources.client.ImageResource;
 
 public class AnnonceAggregate implements Serializable {
 
+  public static final long NO_SURFACE = -1L;
   private static final long serialVersionUID = 1L;
   private List<AnnonceDto> annonces = new ArrayList<AnnonceDto>();
   private int queryMeanPriceBySquareMeter;
@@ -65,13 +66,26 @@ public class AnnonceAggregate implements Serializable {
 
   public Long getLastPriceBySquareMeter() {
     AnnonceDto lastAnnonce = annonces.get(annonces.size() - 1);
-    return Math.round(lastAnnonce.getPrix() / lastAnnonce.getSuperficie());
+    if (lastAnnonce.getSuperficie() > 0) {
+      return Math.round(lastAnnonce.getPrix() / lastAnnonce.getSuperficie());
+    } else {
+      return NO_SURFACE;
+    }
+  }
+
+  public Long getLastPriceBySquareMeterRound() {
+    Long lastPriceBySquareMeter = getLastPriceBySquareMeter();
+    return (lastPriceBySquareMeter / 500) * 500;
   }
 
   public List<Long> getPricesBySquareMeter() {
     List<Long> prices = new ArrayList<Long>();
     for (AnnonceDto annonce : annonces) {
-      prices.add(Math.round(annonce.getPrix() / annonce.getSuperficie()));
+      if (annonce.getSuperficie() > 0) {
+        prices.add(Math.round(annonce.getPrix() / annonce.getSuperficie()));
+      } else {
+        prices.add(NO_SURFACE);
+      }
     }
     return prices;
   }

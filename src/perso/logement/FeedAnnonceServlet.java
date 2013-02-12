@@ -51,7 +51,7 @@ public class FeedAnnonceServlet extends HttpServlet {
     }
     int nbAnnonceFeeded = startProcess(arrondissement, quartier, nbPieces);
     resp.setContentType("text/plain");
-    resp.getWriter().println(nbAnnonceFeeded + " annonces ont �t� enregistr�es");
+    resp.getWriter().println(nbAnnonceFeeded + " annonces ont été enregistrées");
   }
 
   // idq correspond au quartier...

@@ -13,6 +13,7 @@ import perso.logement.core.AnnonceKey;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ImageResourceCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -27,11 +28,28 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.sencha.gxt.chart.client.chart.Chart;
+import com.sencha.gxt.chart.client.chart.Chart.Position;
+import com.sencha.gxt.chart.client.chart.Legend;
+import com.sencha.gxt.chart.client.chart.axis.CategoryAxis;
+import com.sencha.gxt.chart.client.chart.axis.NumericAxis;
+import com.sencha.gxt.chart.client.chart.series.BarSeries;
+import com.sencha.gxt.chart.client.chart.series.SeriesHighlighter;
+import com.sencha.gxt.chart.client.draw.Color;
+import com.sencha.gxt.chart.client.draw.DrawFx;
+import com.sencha.gxt.chart.client.draw.RGB;
+import com.sencha.gxt.chart.client.draw.sprite.Sprite;
+import com.sencha.gxt.chart.client.draw.sprite.TextSprite;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
+import com.sencha.gxt.fx.client.easing.BounceOut;
+import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.FramedPanel;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.DateField;
@@ -51,9 +69,17 @@ public class LogementWidget implements IsWidget {
   private ListBox queryTypeListBox = new ListBox();
   private DateField datePicker = new DateField();
   private TextField queryMeanPrice = new TextField();
+  private TextField surfaceMinTextBox = new TextField();
+  private TextField surfaceMaxTextBox = new TextField();
+  private TextField priceMinTextBox = new TextField();
+  private TextField priceMaxTextBox = new TextField();
+
   private Grid<AnnonceAggregate> annonceGrid;
-  private ListStore<AnnonceAggregate> store;
+  private ListStore<AnnonceAggregate> annonceStore;
+  private AnnonceAggregateStore annonceAggregateStore = new AnnonceAggregateStore();
+  private ListStore<AnnonceStatistic> annonceStatisticStore;
   private GridView<AnnonceAggregate> view;
+  private Chart<AnnonceStatistic> chart;
   private RowExpander<AnnonceAggregate> expander;
 
   private static final String ANNONCES_WITH_PRICE_CHANGE_ONLY = "priceFallOnly";
@@ -62,7 +88,10 @@ public class LogementWidget implements IsWidget {
 
   private AnnonceQueryCommand annonceQueryCommand = new AnnonceQueryCommand(this);
 
-  private static final AnnonceAggregateProperties properties = GWT.create(AnnonceAggregateProperties.class);
+  private static final AnnonceAggregateProperties annonceAggregateProperties = GWT
+      .create(AnnonceAggregateProperties.class);
+  private static final AnnonceStatisticProperties annonceStatisticProperties = GWT
+      .create(AnnonceStatisticProperties.class);
 
   @Override
   public Widget asWidget() {
@@ -74,14 +103,30 @@ public class LogementWidget implements IsWidget {
     configPanel(queryPortlet);
     queryPortlet.add(createQueryForm());
     queryPortlet.setHeight(250);
+    queryPortlet.setWidth(300);
     portal.add(queryPortlet, 0);
 
-    Portlet resultPortlet = new Portlet();
-    resultPortlet.setHeadingText("Result");
-    configPanel(resultPortlet);
-    resultPortlet.add(initAnnonceTable());
-    resultPortlet.setHeight(500);
-    portal.add(resultPortlet, 0);
+    Portlet annoncesPortlet = new Portlet();
+    annoncesPortlet.setHeadingText("Annonces");
+    configPanel(annoncesPortlet);
+    annoncesPortlet.add(createAnnonceTable());
+    annoncesPortlet.setHeight(500);
+    queryPortlet.setWidth(300);
+    portal.add(annoncesPortlet, 0);
+
+    Portlet statPortlet = new Portlet();
+    statPortlet.setHeadingText("Statistics");
+    configPanel(statPortlet);
+    statPortlet.add(createResultsStatisticsWidget());
+    statPortlet.setHeight(100);
+    portal.add(statPortlet, 0);
+
+    Portlet pricesBySquareMeterGraphPortlet = new Portlet();
+    pricesBySquareMeterGraphPortlet.setHeadingText("Graphs");
+    configPanel(pricesBySquareMeterGraphPortlet);
+    pricesBySquareMeterGraphPortlet.add(createPricesBySquareMeterGraph());
+    pricesBySquareMeterGraphPortlet.setHeight(500);
+    portal.add(pricesBySquareMeterGraphPortlet, 0);
 
     return portal;
   }
@@ -110,15 +155,26 @@ public class LogementWidget implements IsWidget {
     datePanel.add(new Label("Date de debut : "));
     datePanel.add(datePicker);
 
-    HorizontalPanel arrondissementPanel = new HorizontalPanel();
-    vp.add(arrondissementPanel);
-    arrondissementPanel.add(new Label("Arrondissement : "));
-    arrondissementPanel.add(arrondissementListBox);
+    HorizontalPanel localisationPanel = new HorizontalPanel();
+    vp.add(localisationPanel);
+    localisationPanel.add(new Label("Arrondissement : "));
+    localisationPanel.add(arrondissementListBox);
+    localisationPanel.add(new Label("Quartier : "));
+    localisationPanel.add(quartierListBox);
 
-    HorizontalPanel quartierPanel = new HorizontalPanel();
-    vp.add(quartierPanel);
-    quartierPanel.add(new Label("Quartier : "));
-    quartierPanel.add(quartierListBox);
+    HorizontalPanel surfacePanel = new HorizontalPanel();
+    vp.add(surfacePanel);
+    surfacePanel.add(new Label("Surface min : "));
+    surfacePanel.add(surfaceMinTextBox);
+    surfacePanel.add(new Label("Surface max : "));
+    surfacePanel.add(surfaceMaxTextBox);
+
+    HorizontalPanel pricePanel = new HorizontalPanel();
+    vp.add(pricePanel);
+    pricePanel.add(new Label("Prix min : "));
+    pricePanel.add(priceMinTextBox);
+    pricePanel.add(new Label("Prix max : "));
+    pricePanel.add(priceMaxTextBox);
 
     HorizontalPanel queryTypePanel = new HorizontalPanel();
     vp.add(queryTypePanel);
@@ -128,56 +184,145 @@ public class LogementWidget implements IsWidget {
     Button submitButton = createSubmitButton();
     vp.add(submitButton);
 
-    HorizontalPanel queryMeanPricePanel = new HorizontalPanel();
-    queryMeanPrice.setReadOnly(true);
-    vp.add(queryMeanPricePanel);
-    queryMeanPricePanel.add(new Label("Moyenne du prix au m² pour cette requête : "));
-    queryMeanPricePanel.add(queryMeanPrice);
-
     return vp;
   }
 
-  private Widget initAnnonceTable() {
+  private Widget createAnnonceTable() {
     final ColumnModel<AnnonceAggregate> columnModel = new ColumnModel<AnnonceAggregate>(buildColumnConfig());
-    store = new ListStore<AnnonceAggregate>(properties.key());
+    annonceStore = new ListStore<AnnonceAggregate>(annonceAggregateProperties.key());
 
-    annonceGrid = new Grid<AnnonceAggregate>(store, columnModel);
+    annonceGrid = new Grid<AnnonceAggregate>(annonceStore, columnModel);
     annonceGrid.setHeight(500); // TODO : comment faire autrement?
     annonceGrid.setView(buildView());
     annonceGrid.setBorders(true);
     expander.initPlugin(annonceGrid);
+
     return annonceGrid;
   }
 
+  private Widget createResultsStatisticsWidget() {
+    HorizontalPanel queryMeanPricePanel = new HorizontalPanel();
+    queryMeanPrice.setReadOnly(true);
+    queryMeanPricePanel.add(new Label("Moyenne du prix au m² pour cette requête : "));
+    queryMeanPricePanel.add(queryMeanPrice);
+    return queryMeanPricePanel;
+  }
+
+  private static ContentPanel createContentPanel(String title, Widget... widgetsToAdd) {
+    ContentPanel panel = new FramedPanel();
+    panel.getElement().getStyle().setMargin(10, Unit.PX);
+
+    panel.setCollapsible(true);
+    panel.setHeadingText(title);
+    //panel.setPixelSize(620, 500);
+    panel.setBodyBorder(true);
+    panel.setBodyStyleName("white-bg");
+
+    VerticalLayoutContainer layout = new VerticalLayoutContainer();
+    layout.setBorders(true);
+    panel.add(layout);
+    for (Widget widgetToAdd : widgetsToAdd) {
+      layout.add(widgetToAdd);
+    }
+    return panel;
+  }
+
+  private Widget createPricesBySquareMeterGraph() {
+    annonceStatisticStore = new ListStore<AnnonceStatistic>(annonceStatisticProperties.key());
+
+    chart = new Chart<AnnonceStatistic>();
+    chart.setStore(annonceStatisticStore);
+    chart.setShadowChart(true);
+    chart.setAnimationDuration(750);
+    chart.setAnimationEasing(new BounceOut());
+
+    NumericAxis<AnnonceStatistic> axis = new NumericAxis<AnnonceStatistic>();
+    axis.setPosition(Position.LEFT);
+    axis.addField(annonceStatisticProperties.nbAnnonces());
+    TextSprite title = new TextSprite("Nombre d'annonces");
+    title.setFontSize(18);
+    axis.setTitleConfig(title);
+    axis.setDisplayGrid(true);
+    axis.setMinimum(0);
+    chart.addAxis(axis);
+
+    CategoryAxis<AnnonceStatistic, Long> catAxis = new CategoryAxis<AnnonceStatistic, Long>();
+    catAxis.setPosition(Position.BOTTOM);
+    catAxis.setField(annonceStatisticProperties.priceBySquareMeter());
+    title = new TextSprite("Prix/m²");
+    title.setFontSize(18);
+    catAxis.setTitleConfig(title);
+    TextSprite categoryLabelConfig = new TextSprite();
+    categoryLabelConfig.setRotation(45);
+    categoryLabelConfig.setTranslation(0, -30);
+    catAxis.setLabelConfig(categoryLabelConfig);
+    chart.addAxis(catAxis);
+
+    BarSeries<AnnonceStatistic> columnSeries = new BarSeries<AnnonceStatistic>();
+    columnSeries.setYAxisPosition(Position.LEFT);
+    columnSeries.addYField(annonceStatisticProperties.nbAnnonces());
+    columnSeries.addColor(new RGB(76, 153, 0));
+    columnSeries.setColumn(true);
+    columnSeries.setHighlighting(true);
+    columnSeries.setHighlighter(new SeriesHighlighter() {
+      @Override
+      public void highlight(Sprite sprite) {
+        sprite.setStroke(new RGB(85, 85, 204));
+        DrawFx.createStrokeWidthAnimator(sprite, 10).run(250);
+      }
+
+      @Override
+      public void unHighlight(Sprite sprite) {
+        sprite.setStroke(Color.NONE);
+        DrawFx.createStrokeWidthAnimator(sprite, 0).run(250);
+      }
+    });
+    chart.addSeries(columnSeries);
+
+    Legend<AnnonceStatistic> legend = new Legend<AnnonceStatistic>();
+    legend.setPosition(Position.RIGHT);
+    legend.setItemHighlighting(true);
+    legend.setItemHiding(true);
+    chart.setLegend(legend);
+    chart.setLayoutData(new VerticalLayoutData(1, 1));
+
+    ContentPanel panel =
+        createContentPanel("Répartition (toutes les annonces y compris celles dont le prix ne change pas)", chart);
+
+    return panel;
+  }
+
   /**
-   * build store configuration with respect to ext-gwt format
+   * build annonceStore configuration with respect to ext-gwt format
    * 
    * @return List<ColumnConfig> list of column configuration
    */
   private List<ColumnConfig<AnnonceAggregate, ?>> buildColumnConfig() {
     List<ColumnConfig<AnnonceAggregate, ?>> columnsConfig = new ArrayList<ColumnConfig<AnnonceAggregate, ?>>();
     ColumnConfig<AnnonceAggregate, String> cc1 =
-        new ColumnConfig<AnnonceAggregate, String>(properties.reference(), 100, "Reference");
+        new ColumnConfig<AnnonceAggregate, String>(annonceAggregateProperties.reference(), 100, "Reference");
     ColumnConfig<AnnonceAggregate, Double> cc2 =
-        new ColumnConfig<AnnonceAggregate, Double>(properties.superficie(), 100, "Superficie");
+        new ColumnConfig<AnnonceAggregate, Double>(annonceAggregateProperties.superficie(), 100, "Superficie");
     ColumnConfig<AnnonceAggregate, Short> cc3 =
-        new ColumnConfig<AnnonceAggregate, Short>(properties.arrondissement(), 100, "Arrondissement");
+        new ColumnConfig<AnnonceAggregate, Short>(annonceAggregateProperties.arrondissement(), 100, "Arrondissement");
     ColumnConfig<AnnonceAggregate, String> cc4 =
-        new ColumnConfig<AnnonceAggregate, String>(properties.quartier(), 100, "Quartier");
+        new ColumnConfig<AnnonceAggregate, String>(annonceAggregateProperties.quartier(), 100, "Quartier");
     ColumnConfig<AnnonceAggregate, Double> cc5 =
-        new ColumnConfig<AnnonceAggregate, Double>(properties.lastPrice(), 100, "Prix");
+        new ColumnConfig<AnnonceAggregate, Double>(annonceAggregateProperties.lastPrice(), 100, "Prix");
     ColumnConfig<AnnonceAggregate, ImageResource> cc6 =
-        new ColumnConfig<AnnonceAggregate, ImageResource>(properties.evolutionImage(), 100, "Evolution");
+        new ColumnConfig<AnnonceAggregate, ImageResource>(annonceAggregateProperties.evolutionImage(), 100, "Evolution");
     cc6.setCell(new ImageResourceCell());
     ColumnConfig<AnnonceAggregate, Long> cc7 =
-        new ColumnConfig<AnnonceAggregate, Long>(properties.lastPriceBySquareMeter(), 100, "Prix/m²");
+        new ColumnConfig<AnnonceAggregate, Long>(annonceAggregateProperties.lastPriceBySquareMeter(), 100, "Prix/m²");
     ColumnConfig<AnnonceAggregate, Double> cc8 =
-        new ColumnConfig<AnnonceAggregate, Double>(properties.meanPriceDifference(), 100, "Différence à la moyenne");
+        new ColumnConfig<AnnonceAggregate, Double>(annonceAggregateProperties.meanPriceDifference(), 100,
+            "Différence à la moyenne");
     ColumnConfig<AnnonceAggregate, ImageResource> cc9 =
-        new ColumnConfig<AnnonceAggregate, ImageResource>(properties.meanPriceDifferenceImage(), 100, "");
+        new ColumnConfig<AnnonceAggregate, ImageResource>(annonceAggregateProperties.meanPriceDifferenceImage(), 100,
+            "");
     cc9.setCell(new ImageResourceCell());
     ColumnConfig<AnnonceAggregate, String> cc10 =
-        new ColumnConfig<AnnonceAggregate, String>(properties.seLogerLink(), 100, "Lien");
+        new ColumnConfig<AnnonceAggregate, String>(annonceAggregateProperties.seLogerLink(), 100, "Lien");
     cc10.setCell(new AbstractCell<String>() {
       @Override
       public void render(Context context, String value, SafeHtmlBuilder sb) {
@@ -237,9 +382,29 @@ public class LogementWidget implements IsWidget {
           quartier = quartierListBox.getValue(quartierListBox.getSelectedIndex());
         }
 
+        Double surfaceMin = null;
+        if (surfaceMinTextBox.getText() != null && surfaceMinTextBox.getText().length() != 0) {
+          surfaceMin = Double.parseDouble(surfaceMinTextBox.getText());
+        }
+
+        Double surfaceMax = null;
+        if (surfaceMaxTextBox.getText() != null && surfaceMaxTextBox.getText().length() != 0) {
+          surfaceMax = Double.parseDouble(surfaceMaxTextBox.getText());
+        }
+
+        Double priceMin = null;
+        if (priceMinTextBox.getText() != null && priceMinTextBox.getText().length() != 0) {
+          priceMin = Double.parseDouble(priceMinTextBox.getText());
+        }
+
+        Double priceMax = null;
+        if (priceMaxTextBox.getText() != null && priceMaxTextBox.getText().length() != 0) {
+          priceMax = Double.parseDouble(priceMaxTextBox.getText());
+        }
+
         annonceQueryCommand.getAnnonces(datePicker.getValue(), arrondissementListBox.getValue(arrondissementListBox
-            .getSelectedIndex()), ALL_QUARTIERS.equals(quartier) ? "" : quartier, queryTypeListBox
-            .getValue(queryTypeListBox.getSelectedIndex()));
+            .getSelectedIndex()), ALL_QUARTIERS.equals(quartier) ? "" : quartier, surfaceMin, surfaceMax, priceMin,
+            priceMax, queryTypeListBox.getValue(queryTypeListBox.getSelectedIndex()));
       }
     });
     return submitButton;
@@ -247,7 +412,9 @@ public class LogementWidget implements IsWidget {
 
   public void updateResult(List<AnnonceDto> annonces) {
     removePendingStatus();
-    store.clear();
+    annonceStore.clear();
+    annonceStatisticStore.clear();
+    annonceAggregateStore.clear();
     Map<AnnonceKey, AnnonceAggregate> annonceAggregateByAnnonceKey = new HashMap<AnnonceKey, AnnonceAggregate>();
     for (AnnonceDto annonce : annonces) {
       AnnonceKey annonceKey =
@@ -262,6 +429,8 @@ public class LogementWidget implements IsWidget {
       }
       annonceAggregate.addAnnonce(annonce);
     }
+
+    annonceAggregateStore.addAnnonceAggregates(annonceAggregateByAnnonceKey.values());
 
     // 1. We filter annonces with no price change if need be
     String queryTypeParameter = queryTypeListBox.getValue(queryTypeListBox.getSelectedIndex());
@@ -280,7 +449,7 @@ public class LogementWidget implements IsWidget {
     // 2. We compute the mean price by square meter value
     double currentPriceBySquareMeterSum = 0;
     int nbAnnoncesWithNullSuperficie = 0;
-    for (AnnonceAggregate annonceAggregate : annoncesToDisplay) {
+    for (AnnonceAggregate annonceAggregate : annonceAggregateByAnnonceKey.values()) {
       List<Double> prices = annonceAggregate.getPrices();
       if (annonceAggregate.getSuperficie() != 0) {
         currentPriceBySquareMeterSum += (prices.get(prices.size() - 1)) / annonceAggregate.getSuperficie();
@@ -289,15 +458,24 @@ public class LogementWidget implements IsWidget {
       }
     }
     int meanPriceBySquareMeter =
-        (int) (currentPriceBySquareMeterSum / (annoncesToDisplay.size() - nbAnnoncesWithNullSuperficie));
+        (int) (currentPriceBySquareMeterSum / (annonceAggregateByAnnonceKey.size() - nbAnnoncesWithNullSuperficie));
 
     for (AnnonceAggregate annonceToDisplay : annoncesToDisplay) {
       annonceToDisplay.setQueryMeanPriceBySquareMeter(meanPriceBySquareMeter);
-      store.add(annonceToDisplay);
+      if (annonceToDisplay.getLastPrice() > 0) {
+        annonceStore.add(annonceToDisplay);
+      }
+    }
+
+    // We refresh the graph
+    List<AnnonceStatistic> annonceStatistics = annonceAggregateStore.getAnnonceStatistics();
+    for (AnnonceStatistic annonceStatistic : annonceStatistics) {
+      annonceStatisticStore.add(annonceStatistic);
     }
 
     queryMeanPrice.setValue(String.valueOf(meanPriceBySquareMeter));
     view.refresh(true);
+    chart.redrawChart();
     log.info("Nb annonces that should be displayed in the table : " + annoncesToDisplay.size());
   }
 
@@ -333,9 +511,11 @@ public class LogementWidget implements IsWidget {
 
   public void displayPendingStatus() {
     annonceGrid.mask("Getting annonces");
+    chart.mask("Getting annonces");
   }
 
   private void removePendingStatus() {
     annonceGrid.unmask();
+    chart.unmask();
   }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
 <!-- Arrondissement 10 -->
-<cron>
+<!--cron>
 <url>/feedAnnonce?quartier=133091&#x26;arrondissement=10</url>
 <schedule>every monday 06:00</schedule>
 <timezone>Europe/Paris</timezone>
@@ -31,7 +31,6 @@
 <schedule>every monday 06:05</schedule>
 <timezone>Europe/Paris</timezone>
 </cron>
-<!-- Arrondissement 18 -->
 <cron>
 <url>/feedAnnonce?quartier=133146&#x26;arrondissement=18</url>
 <schedule>every tuesday 06:00</schedule>
@@ -91,5 +90,5 @@
 <url>/feedAnnonce?quartier=133149&#x26;arrondissement=18&#x26;nbPieces=5</url>
 <schedule>every tuesday 06:11</schedule>
 <timezone>Europe/Paris</timezone>
-</cron>
+</cron-->
 </cronentries>
